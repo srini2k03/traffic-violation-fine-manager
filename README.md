@@ -1,6 +1,8 @@
 # Traffic Violation & Fine Manager (e-Challan)
 
 [![Android CI](https://github.com/srini2k03/traffic-violation-fine-manager/actions/workflows/android-ci.yml/badge.svg)](https://github.com/srini2k03/traffic-violation-fine-manager/actions/workflows/android-ci.yml)
+[![Live site](https://img.shields.io/badge/Live%20site-srini2k03.github.io-0B3D91?logo=githubpages&logoColor=white)](https://srini2k03.github.io/traffic-violation-fine-manager/)
+[![Download APK](https://img.shields.io/badge/Download-APK-3DDC84?logo=android&logoColor=white)](https://github.com/srini2k03/traffic-violation-fine-manager/releases/latest/download/traffic-fine-manager.apk)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.1-7F52FF?logo=kotlin&logoColor=white)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20RTDB%20%7C%20Storage-FFCA28?logo=firebase&logoColor=black)
@@ -10,6 +12,11 @@
 A native Android app that lets traffic police officers **issue digital violation notices (e-challans) in real time** —
 even with no network — and keeps officer activity logs and violation history securely in Firebase.
 
+**[Live site](https://srini2k03.github.io/traffic-violation-fine-manager/)** ·
+**[Download the APK](https://github.com/srini2k03/traffic-violation-fine-manager/releases/latest/download/traffic-fine-manager.apk)**
+(latest build of `main`, debug-signed, Android 7.0+) · tap **Try the demo** on the login screen to explore it without an
+account.
+
 > Originally built in September 2023 as a Kotlin + Firebase project; this repository is the
 > re-architected "advanced" version (Clean Architecture, Compose, offline-first sync).
 
@@ -18,6 +25,7 @@ even with no network — and keeps officer activity logs and violation history s
 ## Table of contents
 
 - [Features](#features)
+- [Demo mode](#demo-mode)
 - [Architecture](#architecture)
 - [Data model](#data-model)
 - [Security rules](#security-rules)
@@ -44,6 +52,23 @@ even with no network — and keeps officer activity logs and violation history s
 | **Admin console** | For `role = admin`: analytics over 7 / 30 / 90 days with **hand-drawn Compose Canvas charts** (daily issued-vs-collected bars, status donut, offence-category and top-offence bars, officer leaderboard), KPIs (collection rate, repeat-offender share), and **officer management** (live officer directory, activate/deactivate accounts, per-officer performance). Admins can also cancel pending challans with a recorded reason. |
 | **Profile & settings** | Officer profile (badge, station, role), sync status with pending-change count and "sync now", password-reset email, link to the activity log, app version, and sign-out with a warning when changes are still unsynced. |
 | **Offline-first** | Room is the single source of truth; every write is queued with a pending-operation marker and pushed by a Hilt-injected **WorkManager** worker (network-constrained, exponential backoff, periodic safety net). Firebase RTDB offline persistence is enabled as well. |
+
+## Demo mode
+
+The app can be explored without a Firebase project or an account. The login screen offers **Try the demo** (station
+admin, which unlocks the admin console) and **Demo as a field officer**. Starting a demo:
+
+- seeds a deterministic month of sample data into Room (`DemoDataFactory` in `:domain`): challans from four officers,
+  valid plates from several states including BH series, repeat offenders priced by the real `FineCalculator`,
+  paid / pending / cancelled records and the matching activity log;
+- signs in locally (`DemoAwareAuthRepository`); Firebase is never constructed, the sync engine is skipped and the
+  location provider reports a fixed spot in Adyar, Chennai;
+- keeps demo rows (officer uids starting with `demo-`) invisible to real sessions and vice versa, and deletes them on
+  sign-out.
+
+Demo mode is compiled in via `BuildConfig.DEMO_MODE`: on for debug builds, and for release builds without
+`google-services.json`. Override with `./gradlew assembleRelease -PdemoMode=false`. Builds without a Firebase config now
+start on the login screen (sign-in disabled, demo offered) instead of crashing.
 
 ## Architecture
 
@@ -232,8 +257,8 @@ It is listed in `.gitignore` and must **never** be committed —
 [`app/google-services.json.example`](app/google-services.json.example) shows the expected shape only.
 
 The Google Services Gradle plugin is applied **only when that file exists**, so the project still builds (lint and
-unit tests) without it, which is how CI runs. A build without the file will crash on launch because Firebase is not
-initialised.
+unit tests) without it, which is how CI runs. A build without the file runs in [demo mode](#demo-mode) only: sign-in
+is disabled and the login screen offers the demo.
 
 ### 4. Create officer accounts
 
@@ -277,17 +302,44 @@ initialised.
 | `AdminViewModelTest`, `ViolationDetailViewModelTest` | analytics range switching, officer list errors, activation feedback, payment / PDF share / cancellation flows |
 | `MappersTest` (data) | Room entity and Realtime Database map round-trips (incl. cancellation), malformed node handling |
 
-GitHub Actions ([`.github/workflows/android-ci.yml`](.github/workflows/android-ci.yml)) runs on JDK 17:
-rules JSON validation → `./gradlew lint testDebugUnitTest :domain:test` → uploads reports.
-No secrets are required; optionally store a base64 `GOOGLE_SERVICES_JSON` secret to build with real config.
+| `DemoDataFactoryTest`, `StartDemoUseCaseTest` | demo seed is deterministic, valid (plates, challan numbers, fines, statuses) and covers today; demo start / unavailable / failure |
+| `DemoModeTest` (data), `LoginViewModelTest` | demo session precedence over Firebase, no Firebase access without a config, cleanup on sign-out, demo roster; login demo buttons and backend-missing state |
+| `ScreenshotTour` (androidTest) | instrumented Compose tour of login, dashboard, issue, history, detail and admin in demo mode, saving full-screen screenshots |
+
+### GitHub Actions
+
+| Workflow | Trigger | What it does |
+| --- | --- | --- |
+| [`android-ci.yml`](.github/workflows/android-ci.yml) | push / PR to `main`, tags `v*` | rules JSON validation → `./gradlew assembleDebug lint testDebugUnitTest :domain:test` → uploads APK and reports. On pushes it then publishes the APK (see below). |
+| [`pages.yml`](.github/workflows/pages.yml) | push to `main`, manual | builds the app and `ScreenshotTour`, boots an API 34 x86_64 emulator (KVM) with `reactivecircus/android-emulator-runner`, runs [`scripts/capture-screenshots.sh`](scripts/capture-screenshots.sh) in light and dark themes, uploads the PNGs as an artifact, then deploys [`web/`](web/) plus the screenshots to the `gh-pages` branch with `peaceiris/actions-gh-pages`. If the emulator job fails, the site is still deployed with placeholder previews. |
+
+**Releases.** Every push to `main` force-moves the `latest` tag and updates the rolling
+[`latest` release](https://github.com/srini2k03/traffic-violation-fine-manager/releases/tag/latest), so
+<https://github.com/srini2k03/traffic-violation-fine-manager/releases/latest/download/traffic-fine-manager.apk> always
+serves the newest build. Pushing a tag such as `v1.1.0` creates a versioned release with
+`traffic-fine-manager.apk` and `traffic-fine-manager-v1.1.0.apk`, and sets `versionName` from the tag. Release APKs are
+**debug builds signed with a throwaway CI key**, so uninstall an earlier build before installing a newer one.
+
+**Website.** The landing page is plain HTML/CSS/JS in [`web/`](web/) (no build step); preview it with
+`python3 -m http.server -d web`. For the first deploy, set **Settings → Pages → Build and deployment → Deploy from a
+branch → `gh-pages` / root** once.
+
+No secrets are required; optionally store a base64 `GOOGLE_SERVICES_JSON` secret to build (and release) with real
+Firebase config.
 
 ## Screenshots
 
-| Login | Dashboard | Issue challan | Challan PDF |
-| --- | --- | --- | --- |
-| _`docs/screenshots/login.png`_ | _`docs/screenshots/dashboard.png`_ | _`docs/screenshots/issue.png`_ | _`docs/screenshots/challan-pdf.png`_ |
+Captured in demo mode on an Android 14 emulator by the [`pages.yml`](.github/workflows/pages.yml) workflow and
+published with the [live site](https://srini2k03.github.io/traffic-violation-fine-manager/#screens) (light and dark
+variants). They appear after the first successful run of that workflow.
 
-_Screenshots to be added._
+| Login | Dashboard | Issue violation |
+| --- | --- | --- |
+| <img src="https://srini2k03.github.io/traffic-violation-fine-manager/screenshots/login-light.png" width="240" alt="Login"> | <img src="https://srini2k03.github.io/traffic-violation-fine-manager/screenshots/dashboard-light.png" width="240" alt="Dashboard"> | <img src="https://srini2k03.github.io/traffic-violation-fine-manager/screenshots/issue-light.png" width="240" alt="Issue violation"> |
+
+| History | Challan detail | Admin analytics |
+| --- | --- | --- |
+| <img src="https://srini2k03.github.io/traffic-violation-fine-manager/screenshots/history-light.png" width="240" alt="History"> | <img src="https://srini2k03.github.io/traffic-violation-fine-manager/screenshots/detail-light.png" width="240" alt="Challan detail"> | <img src="https://srini2k03.github.io/traffic-violation-fine-manager/screenshots/admin-light.png" width="240" alt="Admin analytics"> |
 
 ## Tech stack
 
@@ -299,8 +351,8 @@ _Screenshots to be added._
 | Backend | Firebase Authentication (custom claims), Realtime Database (offline persistence), Cloud Storage |
 | Local / background | Room, WorkManager, kotlinx.serialization |
 | Device | Fused Location Provider, Geocoder, Activity Result API (camera), `PdfDocument`, ZXing, `FileProvider` |
-| Testing | JUnit 4, MockK, Turbine, kotlinx-coroutines-test |
-| CI | GitHub Actions |
+| Testing | JUnit 4, MockK, Turbine, kotlinx-coroutines-test, Compose UI test (instrumented screenshot tour) |
+| CI / CD | GitHub Actions, Android Emulator Runner, GitHub Releases, GitHub Pages |
 
 ## Project structure
 
@@ -331,16 +383,21 @@ traffic-violation-fine-manager/
 │   ├── database.rules.json
 │   ├── storage.rules
 │   └── sample-data.json
-├── scripts/set-role.mjs                   # Admin SDK: role claim + officer profile
+├── scripts/
+│   ├── set-role.mjs                       # Admin SDK: role claim + officer profile
+│   ├── capture-screenshots.sh             # emulator screenshot tour (used by pages.yml)
+│   └── make-screenshot-manifest.py        # tells the website which screenshots exist
+├── web/                                   # landing page (GitHub Pages)
 ├── firebase.json                          # rules deploy + emulator config
-├── .github/workflows/android-ci.yml
+├── .github/workflows/                     # android-ci.yml (build, test, release), pages.yml (screenshots, site)
 └── gradle/libs.versions.toml
 ```
 
 ## Roadmap
 
 - [ ] Rules unit tests with the Firebase Emulator Suite (`@firebase/rules-unit-testing`) in CI
-- [ ] Compose UI tests and screenshot tests
+- [x] Instrumented Compose screenshot tour in CI (demo mode)
+- [ ] Compose UI assertions and screenshot diffing
 - [ ] Online payment link (UPI intent / payment gateway) in the challan QR
 - [ ] Vahan / Sarathi integration for owner lookup by registration number
 - [ ] ANPR: plate recognition from the evidence photo with ML Kit text recognition

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 800" role="img" aria-label="Login screen preview">
+<title>Login (preview)</title>
+<rect width="360" height="800" fill="#F4F6FB"/>
+<text x="20" y="22" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#1B2333">9:41</text>
+<rect x="300" y="12" width="40" height="10" rx="3" fill="#1B2333" opacity=".7"/>
+<circle cx="180" cy="190" r="38" fill="#D9E2FF"/>
+<rect x="166" y="168" width="28" height="46" rx="6" fill="#0B3D91"/>
+<circle cx="180" cy="180" r="5" fill="#E53935"/><circle cx="180" cy="191" r="5" fill="#FFB300"/><circle cx="180" cy="202" r="5" fill="#43A047"/>
+<text x="180" y="262" font-family="system-ui,sans-serif" font-size="26" font-weight="700" fill="#1B2333" text-anchor="middle">e-Challan</text>
+<text x="180" y="286" font-family="system-ui,sans-serif" font-size="12.5" font-weight="500" fill="#8A94A8" text-anchor="middle">Traffic enforcement · Officer sign-in</text>
+<rect x="28" y="322" width="304" height="54" rx="8" fill="none" stroke="#8A94A8"/>
+<text x="52" y="354" font-family="system-ui,sans-serif" font-size="13" font-weight="500" fill="#8A94A8" text-anchor="start">Official email</text>
+<rect x="28" y="390" width="304" height="54" rx="8" fill="none" stroke="#8A94A8"/>
+<text x="52" y="422" font-family="system-ui,sans-serif" font-size="13" font-weight="500" fill="#8A94A8" text-anchor="start">Password</text>
+<rect x="28" y="464" width="304" height="50" rx="25" fill="#0B3D91"/>
+<text x="180" y="494" font-family="system-ui,sans-serif" font-size="14" font-weight="600" fill="#fff" text-anchor="middle">Sign in</text>
+<rect x="28" y="548" width="120" height="1.5" rx="1" fill="#DCE2EE"/>
+<text x="180" y="553" font-family="system-ui,sans-serif" font-size="12" font-weight="500" fill="#8A94A8" text-anchor="middle">or</text>
+<rect x="212" y="548" width="120" height="1.5" rx="1" fill="#DCE2EE"/>
+<rect x="28" y="572" width="304" height="50" rx="25" fill="none" stroke="#8A94A8"/>
+<path d="M118 588 l12 9 -12 9z" fill="#0B3D91"/>
+<text x="188" y="602" font-family="system-ui,sans-serif" font-size="14" font-weight="600" fill="#0B3D91" text-anchor="middle">Try the demo</text>
+<text x="180" y="652" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#0B3D91" text-anchor="middle">Demo as a field officer</text>
+<rect x="70" y="756" width="220" height="24" rx="12" fill="#1B2333" opacity=".06"/>
+<text x="180.0" y="772" font-family="system-ui,sans-serif" font-size="10.5" font-weight="500" fill="#8A94A8" text-anchor="middle">Preview · real screenshot comes from CI</text>
+</svg>

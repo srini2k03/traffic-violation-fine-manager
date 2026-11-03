@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 800" role="img" aria-label="Challan detail screen preview">
+<title>Challan detail (preview)</title>
+<rect width="360" height="800" fill="#F4F6FB"/>
+<text x="20" y="22" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#1B2333">9:41</text>
+<rect x="300" y="12" width="40" height="10" rx="3" fill="#1B2333" opacity=".7"/>
+<rect x="0" y="32" width="360" height="56" fill="#FFFFFF"/>
+<path d="M28 60 l10 -10 M28 60 l10 10 M28 60 h18" stroke="#1B2333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<text x="64" y="66" font-family="system-ui,sans-serif" font-size="18" font-weight="600" fill="#1B2333" text-anchor="start">Challan details</text>
+<rect x="16" y="100" width="328" height="108" rx="14" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="32" y="128" font-family="system-ui,sans-serif" font-size="11.5" font-weight="600" fill="#8A94A8" text-anchor="start">EC-TN-20261103-4821-K7Q2XM</text>
+<text x="32" y="160" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#1B2333" text-anchor="start">TN 09 AB 1234</text>
+<rect x="32" y="172" width="78" height="24" rx="12" fill="#EF6C00" opacity=".15"/>
+<text x="71" y="188" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#EF6C00" text-anchor="middle">PENDING</text>
+<rect x="268" y="120" width="60" height="60" rx="6" fill="#FFFFFF" stroke="#1B2333"/>
+<rect x="272.0" y="124.0" width="7" height="7" fill="#1B2333"/>
+<rect x="272.0" y="131.4" width="7" height="7" fill="#1B2333"/>
+<rect x="272.0" y="146.2" width="7" height="7" fill="#1B2333"/>
+<rect x="272.0" y="161.0" width="7" height="7" fill="#1B2333"/>
+<rect x="272.0" y="168.4" width="7" height="7" fill="#1B2333"/>
+<rect x="279.4" y="124.0" width="7" height="7" fill="#1B2333"/>
+<rect x="279.4" y="131.4" width="7" height="7" fill="#1B2333"/>
+<rect x="279.4" y="138.8" width="7" height="7" fill="#1B2333"/>
+<rect x="279.4" y="146.2" width="7" height="7" fill="#1B2333"/>
+<rect x="279.4" y="153.6" width="7" height="7" fill="#1B2333"/>
+<rect x="279.4" y="161.0" width="7" height="7" fill="#1B2333"/>
+<rect x="279.4" y="168.4" width="7" height="7" fill="#1B2333"/>
+<rect x="286.8" y="124.0" width="7" height="7" fill="#1B2333"/>
+<rect x="286.8" y="131.4" width="7" height="7" fill="#1B2333"/>
+<rect x="286.8" y="161.0" width="7" height="7" fill="#1B2333"/>
+<rect x="294.2" y="124.0" width="7" height="7" fill="#1B2333"/>
+<rect x="294.2" y="138.8" width="7" height="7" fill="#1B2333"/>
+<rect x="294.2" y="146.2" width="7" height="7" fill="#1B2333"/>
+<rect x="294.2" y="153.6" width="7" height="7" fill="#1B2333"/>
+<rect x="294.2" y="161.0" width="7" height="7" fill="#1B2333"/>
+<rect x="301.6" y="124.0" width="7" height="7" fill="#1B2333"/>
+<rect x="301.6" y="146.2" width="7" height="7" fill="#1B2333"/>
+<rect x="301.6" y="161.0" width="7" height="7" fill="#1B2333"/>
+<rect x="301.6" y="168.4" width="7" height="7" fill="#1B2333"/>
+<rect x="309.0" y="124.0" width="7" height="7" fill="#1B2333"/>
+<rect x="309.0" y="131.4" width="7" height="7" fill="#1B2333"/>
+<rect x="309.0" y="138.8" width="7" height="7" fill="#1B2333"/>
+<rect x="309.0" y="146.2" width="7" height="7" fill="#1B2333"/>
+<rect x="309.0" y="161.0" width="7" height="7" fill="#1B2333"/>
+<rect x="309.0" y="168.4" width="7" height="7" fill="#1B2333"/>
+<rect x="316.4" y="124.0" width="7" height="7" fill="#1B2333"/>
+<rect x="316.4" y="131.4" width="7" height="7" fill="#1B2333"/>
+<rect x="316.4" y="138.8" width="7" height="7" fill="#1B2333"/>
+<text x="20" y="236" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#0B3D91" text-anchor="start">Fine</text>
+<rect x="16" y="246" width="328" height="112" rx="14" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="32" y="274" font-family="system-ui,sans-serif" font-size="12" font-weight="500" fill="#1B2333" text-anchor="start">Riding without helmet · 194D</text>
+<text x="328" y="274" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#1B2333" text-anchor="end">₹1,500</text>
+<text x="32" y="302" font-family="system-ui,sans-serif" font-size="12" font-weight="500" fill="#1B2333" text-anchor="start">No seat belt · 194B</text>
+<text x="328" y="302" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#1B2333" text-anchor="end">₹1,000</text>
+<rect x="32" y="318" width="296" height="1.5" rx="1" fill="#DCE2EE"/>
+<text x="32" y="342" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#1B2333" text-anchor="start">Total</text>
+<text x="328" y="342" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#1B2333" text-anchor="end">₹2,500</text>
+<text x="20" y="386" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#0B3D91" text-anchor="start">Offender</text>
+<rect x="16" y="396" width="328" height="64" rx="14" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="32" y="422" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#1B2333" text-anchor="start">Ravi Kumar</text>
+<text x="32" y="442" font-family="system-ui,sans-serif" font-size="11.5" font-weight="500" fill="#8A94A8" text-anchor="start">+91 98765 43210</text>
+<text x="20" y="488" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#0B3D91" text-anchor="start">Issued</text>
+<rect x="16" y="498" width="328" height="84" rx="14" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="32" y="524" font-family="system-ui,sans-serif" font-size="12.5" font-weight="600" fill="#1B2333" text-anchor="start">Insp. Priya Raman · TNP-4821</text>
+<text x="32" y="544" font-family="system-ui,sans-serif" font-size="11.5" font-weight="500" fill="#8A94A8" text-anchor="start">3 Nov 2026, 11:24</text>
+<text x="32" y="564" font-family="system-ui,sans-serif" font-size="11.5" font-weight="500" fill="#8A94A8" text-anchor="start">LB Road, Adyar, Chennai</text>
+<rect x="16" y="688" width="158" height="48" rx="24" fill="none" stroke="#8A94A8"/>
+<text x="95" y="717" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#0B3D91" text-anchor="middle">Share PDF</text>
+<rect x="186" y="688" width="158" height="48" rx="24" fill="#0B3D91"/>
+<text x="265" y="717" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">Mark paid</text>
+<rect x="70" y="756" width="220" height="24" rx="12" fill="#1B2333" opacity=".06"/>
+<text x="180.0" y="772" font-family="system-ui,sans-serif" font-size="10.5" font-weight="500" fill="#8A94A8" text-anchor="middle">Preview · real screenshot comes from CI</text>
+</svg>
