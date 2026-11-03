@@ -301,7 +301,6 @@ is disabled and the login screen offers the demo.
 | `AnalyticsSummaryTest`, `PriorOffenceCounterTest`, `AdminUseCasesTest` | admin analytics windows and aggregation, prior-offence de-duplication, admin-only cancellation and officer activation |
 | `AdminViewModelTest`, `ViolationDetailViewModelTest` | analytics range switching, officer list errors, activation feedback, payment / PDF share / cancellation flows |
 | `MappersTest` (data) | Room entity and Realtime Database map round-trips (incl. cancellation), malformed node handling |
-
 | `DemoDataFactoryTest`, `StartDemoUseCaseTest` | demo seed is deterministic, valid (plates, challan numbers, fines, statuses) and covers today; demo start / unavailable / failure |
 | `DemoModeTest` (data), `LoginViewModelTest` | demo session precedence over Firebase, no Firebase access without a config, cleanup on sign-out, demo roster; login demo buttons and backend-missing state |
 | `ScreenshotTour` (androidTest) | instrumented Compose tour of login, dashboard, issue, history, detail and admin in demo mode, saving full-screen screenshots |
