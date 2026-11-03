@@ -1,0 +1,39 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+.navigation/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+output.json
+output-metadata.json
+
+# Signing
+*.jks
+*.keystore
+keystore.properties
+
+# Firebase - NEVER commit the real project config
+google-services.json
+GoogleService-Info.plist
+.firebaserc
+firebase-debug.log
+database-debug.log
+storage-debug.log
+
+# Kotlin
+.kotlin/
+
+# OS
+.DS_Store
+Thumbs.db
