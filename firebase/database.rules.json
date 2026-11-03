@@ -8,6 +8,8 @@
         ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'admin')",
         ".write": "auth != null && auth.token.role === 'admin'",
         ".validate": "newData.hasChildren(['name', 'badgeNumber', 'station'])",
+        "email": { ".validate": "newData.isString() && newData.val().length <= 120" },
+        "role": { ".validate": "newData.isString() && newData.val().matches(/^(officer|admin)$/)" },
         "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80" },
         "badgeNumber": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 20" },
         "station": { ".validate": "newData.isString() && newData.val().length <= 80" },
@@ -21,7 +23,7 @@
       ".indexOn": ["vehicleNumber", "officerId", "updatedAt", "issuedAt", "challanNumber"],
 
       "$violationId": {
-        ".write": "auth != null && (auth.token.role === 'admin' || (auth.token.role === 'officer' && !data.exists() && newData.child('officerId').val() === auth.uid))",
+        ".write": "auth != null && (auth.token.role === 'admin' || (auth.token.role === 'officer' && !data.exists() && newData.child('officerId').val() === auth.uid && root.child('officers').child(auth.uid).child('active').val() !== false))",
         ".validate": "newData.hasChildren(['challanNumber', 'vehicleNumber', 'fine', 'officerId', 'issuedAt', 'status', 'updatedAt'])",
 
         "challanNumber": {
@@ -86,6 +88,8 @@
           "$other": { ".validate": false }
         },
 
+        "cancelReason": { ".validate": "newData.isString() && newData.val().length >= 5 && newData.val().length <= 200 && auth.token.role === 'admin'" },
+
         "updatedAt": {
           ".write": "auth != null && (auth.token.role === 'officer' || auth.token.role === 'admin') && data.exists() && root.child('violations').child($violationId).child('status').val() === 'PENDING'",
           ".validate": "newData.isNumber() && newData.val() <= now + 300000 && (!data.exists() || newData.val() >= data.val())"
@@ -103,7 +107,7 @@
           ".write": "auth != null && auth.uid === $uid && !data.exists() && (auth.token.role === 'officer' || auth.token.role === 'admin')",
           ".validate": "newData.hasChildren(['action', 'details', 'timestamp'])",
           "action": {
-            ".validate": "newData.isString() && newData.val().matches(/^(SIGN_IN|SIGN_OUT|VIOLATION_ISSUED|FINE_PAID|CHALLAN_SHARED|SYNC_COMPLETED)$/)"
+            ".validate": "newData.isString() && newData.val().matches(/^(SIGN_IN|SIGN_OUT|VIOLATION_ISSUED|FINE_PAID|CHALLAN_SHARED|CHALLAN_CANCELLED|SYNC_COMPLETED)$/)"
           },
           "details": { ".validate": "newData.isString() && newData.val().length <= 200" },
           "referenceId": { ".validate": "newData.isString()" },

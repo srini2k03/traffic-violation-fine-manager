@@ -48,7 +48,7 @@ class SyncEngine @Inject constructor(
         var report = SyncReport()
         // Records may be added while we push; loop a few times to drain the queue.
         for (attemptNo in 1..MAX_PASSES) {
-            val pass = pushViolations() + pushLogs()
+            val pass = pushViolations(officer) + pushLogs(officer)
             report += pass
             if (pass.pushedViolations + pass.pushedLogs == 0 || pass.hasFailures) break
         }
@@ -56,10 +56,13 @@ class SyncEngine @Inject constructor(
         return report
     }
 
-    private suspend fun pushViolations(): SyncReport {
+    private suspend fun pushViolations(officer: Officer): SyncReport {
         var pushed = 0
         var failed = 0
-        for (entity in violationDao.pending()) {
+        // Records queued by a previously signed-in officer stay local until that officer signs in again;
+        // the security rules would reject them for anyone else (admins may push everything).
+        val mine = violationDao.pending().filter { officer.isAdmin || it.officerId == officer.uid || it.collectedBy == officer.uid }
+        for (entity in mine) {
             val ok = attempt {
                 when (entity.pendingOp) {
                     PendingOp.CREATE -> {
@@ -77,6 +80,10 @@ class SyncEngine @Inject constructor(
                         remote.markPaid(entity.id, payment, entity.updatedAt)
                         violationDao.markSynced(entity.id, entity.updatedAt, null)
                     }
+                    PendingOp.CANCEL -> {
+                        remote.cancel(entity.id, entity.cancelReason.orEmpty(), entity.updatedAt)
+                        violationDao.markSynced(entity.id, entity.updatedAt, null)
+                    }
                     null -> Unit
                 }
             }
@@ -85,10 +92,10 @@ class SyncEngine @Inject constructor(
         return SyncReport(pushedViolations = pushed, failures = failed)
     }
 
-    private suspend fun pushLogs(): SyncReport {
+    private suspend fun pushLogs(officer: Officer): SyncReport {
         var pushed = 0
         var failed = 0
-        for (entity in logDao.pending()) {
+        for (entity in logDao.pending().filter { it.officerId == officer.uid }) {
             val ok = attempt {
                 remote.appendLog(entity.toDomain())
                 logDao.markSynced(entity.id)

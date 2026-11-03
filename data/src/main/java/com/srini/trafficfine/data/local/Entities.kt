@@ -5,7 +5,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /** Pending remote operation for a locally modified row; `null` means fully synced. */
-enum class PendingOp { CREATE, UPDATE_PAYMENT }
+enum class PendingOp { CREATE, UPDATE_PAYMENT, CANCEL }
 
 @Entity(
     tableName = "violations",
@@ -42,6 +42,7 @@ data class ViolationEntity(
     val paymentReference: String?,
     val paidAt: Long?,
     val collectedBy: String?,
+    val cancelReason: String?,
     val updatedAt: Long,
     val pendingOp: PendingOp?,
 )

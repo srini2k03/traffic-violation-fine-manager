@@ -34,6 +34,12 @@ interface ViolationRepository {
 
     suspend fun markPaid(id: String, payment: Payment, updatedAt: Long)
 
+    /** Admin-only: marks the challan CANCELLED with a reason. */
+    suspend fun cancel(id: String, reason: String, updatedAt: Long)
+
+    /** Number of local records (violations + activity logs) not yet mirrored to the server. */
+    fun observeUnsyncedCount(): Flow<Int>
+
     /**
      * Number of earlier offences per violation code recorded against [vehicleNumber]
      * since [sinceMillis]. Implementations should consult the remote store when online
@@ -46,6 +52,13 @@ interface OfficerLogRepository {
     suspend fun record(log: OfficerLog)
 
     fun observeLogs(officerId: String, limit: Int = 200): Flow<List<OfficerLog>>
+}
+
+/** Admin view of officer profiles stored under `/officers`. */
+interface OfficerDirectoryRepository {
+    fun observeOfficers(): Flow<List<Officer>>
+
+    suspend fun setActive(uid: String, active: Boolean)
 }
 
 interface LocationProvider {

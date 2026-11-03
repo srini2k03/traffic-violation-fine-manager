@@ -37,7 +37,7 @@ class AndroidChallanPdfGenerator @Inject constructor(
     private val plateValidator: VehicleNumberValidator,
 ) : ChallanDocumentGenerator {
 
-    private val rupees: NumberFormat = NumberFormat.getCurrencyInstance(Locale("en", "IN")).apply {
+    private val rupees: NumberFormat = NumberFormat.getCurrencyInstance(Locale.Builder().setLanguage("en").setRegion("IN").build()).apply {
         maximumFractionDigits = 0
     }
     private val dateTime = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a", Locale.ENGLISH)

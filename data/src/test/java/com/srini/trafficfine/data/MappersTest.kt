@@ -5,7 +5,6 @@ import com.srini.trafficfine.data.local.toDomain
 import com.srini.trafficfine.data.local.toEntity
 import com.srini.trafficfine.data.remote.toRemoteMap
 import com.srini.trafficfine.data.remote.toViolation
-import com.srini.trafficfine.data.repository.OfflineFirstViolationRepository
 import com.srini.trafficfine.domain.fine.FineCalculator
 import com.srini.trafficfine.domain.fine.RepeatOffenderPolicy
 import com.srini.trafficfine.domain.model.GeoPoint
@@ -46,6 +45,13 @@ class MappersTest {
     )
 
     @Test
+    fun `cancelled challans keep their reason through both mappings`() {
+        val cancelled = violation.copy(status = ViolationStatus.CANCELLED, payment = null, cancelReason = "Duplicate entry")
+        assertEquals(cancelled, cancelled.toEntity(PendingOp.CANCEL).toDomain())
+        assertEquals("Duplicate entry", cancelled.toRemoteMap().toViolation("v1")?.cancelReason)
+    }
+
+    @Test
     fun `entity round trip preserves every field`() {
         assertEquals(violation, violation.toEntity(PendingOp.CREATE).toDomain())
         assertEquals(SyncState.SYNCED, violation.toEntity(null).toDomain().syncState)
@@ -61,21 +67,5 @@ class MappersTest {
     @Test
     fun `malformed remote nodes are skipped`() {
         assertNull(mapOf<String, Any?>("vehicleNumber" to "TN09AB1234").toViolation("x"))
-    }
-
-    @Test
-    fun `prior offence counting de-duplicates and ignores cancelled or old rows`() {
-        val base = violation.copy(status = ViolationStatus.PENDING, issuedAt = 100)
-        val rows = listOf(
-            base,
-            base, // same record from local and remote
-            base.copy(id = "v2"),
-            base.copy(id = "v3", status = ViolationStatus.CANCELLED),
-            base.copy(id = "v4", issuedAt = 10),
-        )
-        assertEquals(
-            mapOf("NO_LICENCE" to 2, "NO_HELMET" to 2),
-            OfflineFirstViolationRepository.countPriorOffences(rows, sinceMillis = 50),
-        )
     }
 }

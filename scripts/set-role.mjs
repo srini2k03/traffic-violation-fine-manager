@@ -28,7 +28,7 @@ initializeApp({ credential: applicationDefault(), databaseURL: process.env.FIREB
 
 const user = await getAuth().getUserByEmail(email);
 await getAuth().setCustomUserClaims(user.uid, { role });
-await getDatabase().ref(`officers/${user.uid}`).set({ name, badgeNumber, station, active: true });
+await getDatabase().ref(`officers/${user.uid}`).set({ name, email, role, badgeNumber, station, active: true });
 
 console.log(`✔ ${email} (${user.uid}) is now '${role}'`);
 process.exit(0);

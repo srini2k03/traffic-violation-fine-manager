@@ -18,6 +18,9 @@ interface OfficerLogDao {
     @Query("SELECT * FROM officer_logs WHERE pending = 1 ORDER BY timestamp")
     suspend fun pending(): List<OfficerLogEntity>
 
+    @Query("SELECT COUNT(*) FROM officer_logs WHERE pending = 1")
+    fun observePendingCount(): Flow<Int>
+
     @Query("UPDATE officer_logs SET pending = 0 WHERE id = :id")
     suspend fun markSynced(id: String)
 }

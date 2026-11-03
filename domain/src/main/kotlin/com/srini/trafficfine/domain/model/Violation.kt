@@ -38,6 +38,8 @@ data class Violation(
     val issuedAt: Long,
     val status: ViolationStatus,
     val payment: Payment?,
+    /** Set when an admin cancels the challan (status = CANCELLED). */
+    val cancelReason: String? = null,
     val syncState: SyncState = SyncState.PENDING,
     val updatedAt: Long = issuedAt,
 ) {

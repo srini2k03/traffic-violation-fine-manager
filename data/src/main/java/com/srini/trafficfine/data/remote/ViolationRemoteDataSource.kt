@@ -34,6 +34,13 @@ class ViolationRemoteDataSource @Inject constructor(
         ).await()
     }
 
+    /** Admin-only (enforced by rules): cancel a pending challan. */
+    suspend fun cancel(id: String, reason: String, updatedAt: Long) {
+        violations.child(id).updateChildren(
+            mapOf("status" to "CANCELLED", "cancelReason" to reason, "updatedAt" to updatedAt),
+        ).await()
+    }
+
     suspend fun fetchByPlate(plate: String): List<Violation> =
         violations.orderByChild("vehicleNumber").equalTo(plate).get().await().toViolations()
 

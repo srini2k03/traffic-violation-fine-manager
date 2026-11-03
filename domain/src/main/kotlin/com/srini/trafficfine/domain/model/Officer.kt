@@ -21,6 +21,7 @@ data class Officer(
     val badgeNumber: String,
     val station: String,
     val role: Role,
+    val active: Boolean = true,
 ) {
     val isAdmin: Boolean get() = role == Role.ADMIN
 }
