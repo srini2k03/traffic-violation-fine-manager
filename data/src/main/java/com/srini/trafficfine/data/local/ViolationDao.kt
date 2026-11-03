@@ -12,7 +12,7 @@ abstract class ViolationDao {
     @Query(
         """
         SELECT * FROM violations
-        WHERE (:plate IS NULL OR vehicleNumber LIKE '%' || :plate || '%' OR challanNumber LIKE '%' || :plate || '%')
+        WHERE (:plate IS NULL OR vehicleNumber LIKE '%' || :plate || '%' OR REPLACE(challanNumber, '-', '') LIKE '%' || :plate || '%')
           AND (:status IS NULL OR status = :status)
           AND (:fromMillis IS NULL OR issuedAt >= :fromMillis)
           AND (:toMillis IS NULL OR issuedAt < :toMillis)

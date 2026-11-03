@@ -14,7 +14,7 @@ data class ViolationFilter(
     fun matches(violation: Violation): Boolean {
         val query = plateQuery?.let(::normalizePlateQuery)?.takeIf { it.isNotEmpty() }
         if (query != null && !violation.vehicleNumber.contains(query) &&
-            !violation.challanNumber.contains(query, ignoreCase = true)
+            !violation.challanNumber.replace("-", "").contains(query, ignoreCase = true)
         ) return false
         if (status != null && violation.status != status) return false
         if (fromMillis != null && violation.issuedAt < fromMillis) return false
@@ -24,6 +24,10 @@ data class ViolationFilter(
     }
 
     companion object {
+        /**
+         * Upper-cases the query and drops spaces and hyphens, so it must be compared with the
+         * hyphen-free form of the challan number (`EC-TN-...` is matched as `ECTN...`).
+         */
         fun normalizePlateQuery(raw: String): String =
             raw.uppercase().filter { it.isLetterOrDigit() || it == '-' }.replace("-", "")
     }
