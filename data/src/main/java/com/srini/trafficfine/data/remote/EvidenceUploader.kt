@@ -7,6 +7,7 @@ import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
 import com.srini.trafficfine.data.di.IoDispatcher
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
@@ -23,7 +24,7 @@ import javax.inject.Singleton
 @Singleton
 class EvidenceUploader @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val storage: FirebaseStorage,
+    private val storage: Lazy<FirebaseStorage>,
     @IoDispatcher private val io: CoroutineDispatcher,
 ) {
     /** @return the download URL, or `null` if the local file no longer exists. */
@@ -32,7 +33,7 @@ class EvidenceUploader @Inject constructor(
         if (!original.exists()) return null
         val prepared = withContext(io) { compress(original) }
         try {
-            val ref = storage.reference.child("${FirebasePaths.EVIDENCE}/$violationId/${original.nameWithoutExtension}.jpg")
+            val ref = storage.get().reference.child("${FirebasePaths.EVIDENCE}/$violationId/${original.nameWithoutExtension}.jpg")
             val metadata = StorageMetadata.Builder()
                 .setContentType("image/jpeg")
                 .setCustomMetadata("violationId", violationId)

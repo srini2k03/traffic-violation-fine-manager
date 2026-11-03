@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.CurrencyRupee
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -35,15 +36,18 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.srini.trafficfine.domain.demo.DemoData
 import com.srini.trafficfine.domain.model.Officer
 import com.srini.trafficfine.domain.model.Violation
 import com.srini.trafficfine.domain.model.ViolationCatalogue
@@ -100,10 +104,13 @@ fun DashboardScreen(
         },
     ) { padding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize().padding(padding).testTag(DASHBOARD_LIST_TAG),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            if (DemoData.isDemoUid(officer.uid)) {
+                item { DemoBanner() }
+            }
             if (officer.isAdmin) {
                 item {
                     Button(onClick = onOpenAdmin, modifier = Modifier.fillMaxWidth()) {
@@ -225,3 +232,25 @@ fun ViolationRow(violation: Violation, onClick: () -> Unit, modifier: Modifier =
         )
     }
 }
+
+@Composable
+private fun DemoBanner() {
+    Surface(
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.Science, contentDescription = null)
+            Spacer(Modifier.width(12.dp))
+            Text(
+                "Demo mode · sample data stored on this device only. Sign out to end the demo.",
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+    }
+}
+
+/** Test tag on the dashboard list (used by the screenshot tour). */
+const val DASHBOARD_LIST_TAG = "dashboard_list"

@@ -8,16 +8,18 @@ import com.google.firebase.storage.FirebaseStorage
 import com.srini.trafficfine.data.local.OfficerLogDao
 import com.srini.trafficfine.data.local.TrafficFineDatabase
 import com.srini.trafficfine.data.local.ViolationDao
-import com.srini.trafficfine.data.location.FusedLocationProvider
 import com.srini.trafficfine.data.pdf.AndroidChallanPdfGenerator
-import com.srini.trafficfine.data.repository.FirebaseAuthRepository
-import com.srini.trafficfine.data.repository.FirebaseOfficerDirectoryRepository
+import com.srini.trafficfine.data.demo.RoomDemoModeRepository
+import com.srini.trafficfine.data.location.DemoAwareLocationProvider
+import com.srini.trafficfine.data.repository.DemoAwareAuthRepository
+import com.srini.trafficfine.data.repository.DemoAwareOfficerDirectoryRepository
 import com.srini.trafficfine.data.repository.OfflineFirstViolationRepository
 import com.srini.trafficfine.data.repository.RoomOfficerLogRepository
 import com.srini.trafficfine.data.sync.WorkManagerSyncScheduler
 import com.srini.trafficfine.domain.fine.RepeatOffenderPolicy
 import com.srini.trafficfine.domain.repository.AuthRepository
 import com.srini.trafficfine.domain.repository.ChallanDocumentGenerator
+import com.srini.trafficfine.domain.repository.DemoModeRepository
 import com.srini.trafficfine.domain.repository.LocationProvider
 import com.srini.trafficfine.domain.repository.OfficerDirectoryRepository
 import com.srini.trafficfine.domain.repository.OfficerLogRepository
@@ -114,7 +116,7 @@ object CoreModule {
 abstract class RepositoryModule {
 
     @Binds
-    abstract fun bindAuthRepository(impl: FirebaseAuthRepository): AuthRepository
+    abstract fun bindAuthRepository(impl: DemoAwareAuthRepository): AuthRepository
 
     @Binds
     abstract fun bindViolationRepository(impl: OfflineFirstViolationRepository): ViolationRepository
@@ -123,13 +125,16 @@ abstract class RepositoryModule {
     abstract fun bindOfficerLogRepository(impl: RoomOfficerLogRepository): OfficerLogRepository
 
     @Binds
-    abstract fun bindOfficerDirectoryRepository(impl: FirebaseOfficerDirectoryRepository): OfficerDirectoryRepository
+    abstract fun bindOfficerDirectoryRepository(impl: DemoAwareOfficerDirectoryRepository): OfficerDirectoryRepository
 
     @Binds
-    abstract fun bindLocationProvider(impl: FusedLocationProvider): LocationProvider
+    abstract fun bindLocationProvider(impl: DemoAwareLocationProvider): LocationProvider
 
     @Binds
     abstract fun bindSyncScheduler(impl: WorkManagerSyncScheduler): SyncScheduler
+
+    @Binds
+    abstract fun bindDemoModeRepository(impl: RoomDemoModeRepository): DemoModeRepository
 
     @Binds
     abstract fun bindChallanDocumentGenerator(impl: AndroidChallanPdfGenerator): ChallanDocumentGenerator

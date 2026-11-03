@@ -12,6 +12,12 @@ interface OfficerLogDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(log: OfficerLogEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(logs: List<OfficerLogEntity>)
+
+    @Query("DELETE FROM officer_logs WHERE officerId LIKE :prefix || '%'")
+    suspend fun deleteByOfficerPrefix(prefix: String): Int
+
     @Query("SELECT * FROM officer_logs WHERE officerId = :officerId ORDER BY timestamp DESC LIMIT :limit")
     fun observe(officerId: String, limit: Int): Flow<List<OfficerLogEntity>>
 

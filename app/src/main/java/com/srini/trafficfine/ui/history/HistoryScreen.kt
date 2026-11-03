@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -100,10 +101,17 @@ fun HistoryScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(state.violations, key = { it.id }) { violation ->
-                        ViolationRow(violation, onClick = { onOpenViolation(violation.id) })
+                        ViolationRow(
+                            violation,
+                            onClick = { onOpenViolation(violation.id) },
+                            modifier = Modifier.testTag(HISTORY_ROW_TAG),
+                        )
                     }
                 }
             }
         }
     }
 }
+
+/** Test tag on each challan row (used by the screenshot tour). */
+const val HISTORY_ROW_TAG = "history_row"

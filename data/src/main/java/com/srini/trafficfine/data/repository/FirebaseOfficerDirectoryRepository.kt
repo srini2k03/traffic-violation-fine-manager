@@ -8,6 +8,7 @@ import com.srini.trafficfine.data.remote.FirebasePaths
 import com.srini.trafficfine.domain.model.Officer
 import com.srini.trafficfine.domain.model.Role
 import com.srini.trafficfine.domain.repository.OfficerDirectoryRepository
+import dagger.Lazy
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -21,10 +22,10 @@ import javax.inject.Singleton
  */
 @Singleton
 class FirebaseOfficerDirectoryRepository @Inject constructor(
-    private val database: FirebaseDatabase,
+    private val database: Lazy<FirebaseDatabase>,
 ) : OfficerDirectoryRepository {
 
-    private val officers get() = database.getReference(FirebasePaths.OFFICERS)
+    private val officers get() = database.get().getReference(FirebasePaths.OFFICERS)
 
     override fun observeOfficers(): Flow<List<Officer>> = callbackFlow {
         val listener = object : ValueEventListener {

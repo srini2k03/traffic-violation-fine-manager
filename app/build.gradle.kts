@@ -11,11 +11,20 @@ plugins {
 
 // The Google Services plugin needs app/google-services.json, which is never committed.
 // Apply it only when the file exists so that CI (lint + unit tests) works without secrets.
-if (file("google-services.json").exists()) {
+val hasFirebaseConfig = file("google-services.json").exists()
+if (hasFirebaseConfig) {
     apply(plugin = "com.google.gms.google-services")
 } else {
-    logger.warn("app/google-services.json not found - building without Firebase config (see README).")
+    logger.warn("app/google-services.json not found - building without Firebase config; only demo mode works (see README).")
 }
+
+// Demo mode (sample data in Room, no Firebase) is on for debug builds and for any build without a
+// Firebase config. Override with -PdemoMode=true|false.
+val demoModeOverride = (findProperty("demoMode") as String?)?.toBooleanStrict()
+
+// CI passes these for tagged releases; local builds keep the defaults.
+val appVersionName = (findProperty("appVersionName") as String?) ?: "1.0.0"
+val appVersionCode = (findProperty("appVersionCode") as String?)?.toInt() ?: 1
 
 android {
     namespace = "com.srini.trafficfine"
@@ -25,8 +34,8 @@ android {
         applicationId = "com.srini.trafficfine"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -34,8 +43,10 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
+            buildConfigField("boolean", "DEMO_MODE", (demoModeOverride ?: true).toString())
         }
         release {
+            buildConfigField("boolean", "DEMO_MODE", (demoModeOverride ?: !hasFirebaseConfig).toString())
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -113,6 +124,7 @@ dependencies {
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }
