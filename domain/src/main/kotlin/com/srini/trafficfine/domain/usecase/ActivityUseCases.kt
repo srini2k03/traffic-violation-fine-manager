@@ -26,12 +26,17 @@ class RecordActivityUseCase @Inject constructor(
                 id = ids.newId(),
                 officerId = officerId,
                 action = action,
-                details = details,
+                details = details.take(MAX_DETAILS_LENGTH),
                 referenceId = referenceId,
                 timestamp = time.now(),
             ),
         )
         sync.requestSync()
+    }
+
+    companion object {
+        /** `officerLogs/$uid/$logId/details` is limited to 200 characters by database.rules.json. */
+        const val MAX_DETAILS_LENGTH = 200
     }
 }
 
