@@ -9,4 +9,6 @@ sealed interface Route {
     @Serializable data object History : Route
     @Serializable data class ViolationDetail(val id: String) : Route
     @Serializable data object ActivityLog : Route
+    @Serializable data object Profile : Route
+    @Serializable data object Admin : Route
 }

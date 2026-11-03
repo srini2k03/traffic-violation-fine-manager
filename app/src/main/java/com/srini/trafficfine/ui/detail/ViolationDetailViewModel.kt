@@ -7,6 +7,7 @@ import com.srini.trafficfine.domain.model.LogAction
 import com.srini.trafficfine.domain.model.PaymentMode
 import com.srini.trafficfine.domain.model.Violation
 import com.srini.trafficfine.domain.repository.ChallanDocumentGenerator
+import com.srini.trafficfine.domain.usecase.CancelViolationUseCase
 import com.srini.trafficfine.domain.usecase.MarkFinePaidUseCase
 import com.srini.trafficfine.domain.usecase.ObserveCurrentOfficerUseCase
 import com.srini.trafficfine.domain.usecase.ObserveViolationUseCase
@@ -29,6 +30,7 @@ data class ShareRequest(val path: String, val challanNumber: String, val phone: 
 
 data class ViolationDetailUiState(
     val violation: Violation? = null,
+    val isAdmin: Boolean = false,
     val isLoading: Boolean = true,
     val isGeneratingPdf: Boolean = false,
     val isMarkingPaid: Boolean = false,
@@ -51,6 +53,7 @@ class ViolationDetailViewModel @Inject constructor(
     private val markFinePaid: MarkFinePaidUseCase,
     private val documents: ChallanDocumentGenerator,
     private val recordActivity: RecordActivityUseCase,
+    private val cancelViolation: CancelViolationUseCase,
 ) : ViewModel() {
 
     /** Matches the `id` property of [com.srini.trafficfine.ui.navigation.Route.ViolationDetail]. */
@@ -59,9 +62,10 @@ class ViolationDetailViewModel @Inject constructor(
     private val transient = MutableStateFlow(Transient())
 
     val state: StateFlow<ViolationDetailUiState> =
-        combine(observeViolation(violationId), transient) { violation, t ->
+        combine(observeViolation(violationId), observeCurrentOfficer(), transient) { violation, officer, t ->
             ViolationDetailUiState(
                 violation = violation,
+                isAdmin = officer?.isAdmin == true,
                 isLoading = false,
                 isGeneratingPdf = t.isGeneratingPdf,
                 isMarkingPaid = t.isMarkingPaid,
@@ -80,6 +84,21 @@ class ViolationDetailViewModel @Inject constructor(
                 it.copy(
                     isMarkingPaid = false,
                     message = result.fold({ "Payment recorded" }, { e -> e.message ?: "Could not record payment" }),
+                )
+            }
+        }
+    }
+
+    fun cancel(reason: String) {
+        if (transient.value.isMarkingPaid) return
+        transient.update { it.copy(isMarkingPaid = true, message = null) }
+        viewModelScope.launch {
+            val officer = observeCurrentOfficer().filterNotNull().first()
+            val result = cancelViolation(officer, violationId, reason)
+            transient.update {
+                it.copy(
+                    isMarkingPaid = false,
+                    message = result.fold({ "Challan cancelled" }, { e -> e.message ?: "Could not cancel challan" }),
                 )
             }
         }

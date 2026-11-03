@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 object Formatters {
-    private val indianLocale = Locale("en", "IN")
+    private val indianLocale = Locale.Builder().setLanguage("en").setRegion("IN").build()
     private val currency: NumberFormat = NumberFormat.getCurrencyInstance(indianLocale).apply {
         maximumFractionDigits = 0
     }

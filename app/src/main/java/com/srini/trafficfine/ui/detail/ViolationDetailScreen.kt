@@ -19,6 +19,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Share
@@ -59,6 +60,7 @@ import coil.compose.AsyncImage
 import com.srini.trafficfine.domain.model.PaymentMode
 import com.srini.trafficfine.domain.model.Violation
 import com.srini.trafficfine.domain.model.ViolationStatus
+import com.srini.trafficfine.domain.usecase.CancelViolationUseCase
 import com.srini.trafficfine.domain.usecase.MarkFinePaidUseCase
 import com.srini.trafficfine.ui.components.BackTopBar
 import com.srini.trafficfine.ui.components.SectionTitle
@@ -75,6 +77,7 @@ fun ViolationDetailScreen(onBack: () -> Unit, viewModel: ViolationDetailViewMode
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
     var showPayDialog by rememberSaveable { mutableStateOf(false) }
+    var showCancelDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(state.share) {
         state.share?.let {
@@ -97,6 +100,11 @@ fun ViolationDetailScreen(onBack: () -> Unit, viewModel: ViolationDetailViewMode
                 } else {
                     IconButton(onClick = viewModel::shareChallan, enabled = state.violation != null) {
                         Icon(Icons.Filled.Share, "Share e-challan PDF")
+                    }
+                }
+                if (state.isAdmin && state.violation?.status == ViolationStatus.PENDING) {
+                    IconButton(onClick = { showCancelDialog = true }, enabled = !state.isMarkingPaid) {
+                        Icon(Icons.Filled.Block, "Cancel challan")
                     }
                 }
             }
@@ -142,6 +150,16 @@ fun ViolationDetailScreen(onBack: () -> Unit, viewModel: ViolationDetailViewMode
                 modifier = Modifier.padding(padding),
             )
         }
+    }
+
+    if (showCancelDialog) {
+        CancelDialog(
+            onDismiss = { showCancelDialog = false },
+            onConfirm = { reason ->
+                showCancelDialog = false
+                viewModel.cancel(reason)
+            },
+        )
     }
 
     if (showPayDialog) {
@@ -200,6 +218,11 @@ private fun DetailContent(violation: Violation, onOpenMap: () -> Unit, modifier:
         Row {
             Text("Total", Modifier.weight(1f), fontWeight = FontWeight.Bold)
             Text(Formatters.rupees(violation.totalFine), fontWeight = FontWeight.Bold)
+        }
+
+        violation.cancelReason?.let { reason ->
+            SectionTitle("Cancellation")
+            Text(reason, color = MaterialTheme.colorScheme.error)
         }
 
         violation.payment?.let { payment ->
@@ -296,5 +319,29 @@ private fun MarkPaidDialog(onDismiss: () -> Unit, onConfirm: (PaymentMode, Strin
             TextButton(onClick = { onConfirm(mode, reference) }, enabled = referenceOk) { Text("Confirm") }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    )
+}
+
+@Composable
+private fun CancelDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+    var reason by rememberSaveable { mutableStateOf("") }
+    val valid = reason.trim().length >= CancelViolationUseCase.MIN_REASON_LENGTH
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Cancel challan") },
+        text = {
+            Column {
+                Text("Cancelled challans stay on record and cannot be paid.", style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = reason,
+                    onValueChange = { reason = it.take(CancelViolationUseCase.MAX_REASON_LENGTH) },
+                    label = { Text("Reason") },
+                    minLines = 2,
+                )
+            }
+        },
+        confirmButton = { TextButton(onClick = { onConfirm(reason) }, enabled = valid) { Text("Cancel challan") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Keep") } },
     )
 }
