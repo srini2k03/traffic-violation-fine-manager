@@ -11,6 +11,7 @@ import com.srini.trafficfine.data.local.ViolationDao
 import com.srini.trafficfine.data.location.FusedLocationProvider
 import com.srini.trafficfine.data.pdf.AndroidChallanPdfGenerator
 import com.srini.trafficfine.data.repository.FirebaseAuthRepository
+import com.srini.trafficfine.data.repository.FirebaseOfficerDirectoryRepository
 import com.srini.trafficfine.data.repository.OfflineFirstViolationRepository
 import com.srini.trafficfine.data.repository.RoomOfficerLogRepository
 import com.srini.trafficfine.data.sync.WorkManagerSyncScheduler
@@ -18,6 +19,7 @@ import com.srini.trafficfine.domain.fine.RepeatOffenderPolicy
 import com.srini.trafficfine.domain.repository.AuthRepository
 import com.srini.trafficfine.domain.repository.ChallanDocumentGenerator
 import com.srini.trafficfine.domain.repository.LocationProvider
+import com.srini.trafficfine.domain.repository.OfficerDirectoryRepository
 import com.srini.trafficfine.domain.repository.OfficerLogRepository
 import com.srini.trafficfine.domain.repository.SyncScheduler
 import com.srini.trafficfine.domain.repository.ViolationRepository
@@ -119,6 +121,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindOfficerLogRepository(impl: RoomOfficerLogRepository): OfficerLogRepository
+
+    @Binds
+    abstract fun bindOfficerDirectoryRepository(impl: FirebaseOfficerDirectoryRepository): OfficerDirectoryRepository
 
     @Binds
     abstract fun bindLocationProvider(impl: FusedLocationProvider): LocationProvider

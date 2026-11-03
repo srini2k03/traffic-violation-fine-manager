@@ -88,15 +88,20 @@ class FirebaseAuthRepository @Inject constructor(
             }.getOrNull()
         }
         val cached = session.cachedOfficer(user.uid)
+        fun field(name: String): String? = profile?.child(name)?.value as? String
+        val active = profile?.child("active")?.value as? Boolean ?: cached?.active ?: true
+        if (!active) {
+            session.clear()
+            return Result.failure(DomainError.AccountDisabled)
+        }
         val officer = Officer(
             uid = user.uid,
-            name = profile?.child("name")?.getValue(String::class.java)
-                ?: cached?.name ?: user.displayName ?: user.email.orEmpty(),
+            name = field("name") ?: cached?.name ?: user.displayName ?: user.email.orEmpty(),
             email = user.email.orEmpty(),
-            badgeNumber = profile?.child("badgeNumber")?.getValue(String::class.java)
-                ?: cached?.badgeNumber ?: user.uid.takeLast(4).uppercase(),
-            station = profile?.child("station")?.getValue(String::class.java) ?: cached?.station.orEmpty(),
+            badgeNumber = field("badgeNumber") ?: cached?.badgeNumber ?: user.uid.takeLast(4).uppercase(),
+            station = field("station") ?: cached?.station.orEmpty(),
             role = role,
+            active = true,
         )
         session.cacheOfficer(officer)
         return Result.success(officer)

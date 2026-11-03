@@ -60,6 +60,7 @@ fun Violation.toEntity(pendingOp: PendingOp?): ViolationEntity = ViolationEntity
     paymentReference = payment?.reference,
     paidAt = payment?.paidAt,
     collectedBy = payment?.collectedBy,
+    cancelReason = cancelReason,
     updatedAt = updatedAt,
     pendingOp = pendingOp,
 )
@@ -90,6 +91,7 @@ fun ViolationEntity.toDomain(): Violation = Violation(
     } else {
         null
     },
+    cancelReason = cancelReason,
     syncState = if (pendingOp == null) SyncState.SYNCED else SyncState.PENDING,
     updatedAt = updatedAt,
 )

@@ -6,6 +6,7 @@ enum class LogAction {
     VIOLATION_ISSUED,
     FINE_PAID,
     CHALLAN_SHARED,
+    CHALLAN_CANCELLED,
     SYNC_COMPLETED,
 }
 

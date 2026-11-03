@@ -53,6 +53,7 @@ fun Violation.toRemoteMap(): Map<String, Any?> = mapOf(
     "issuedAt" to issuedAt,
     "status" to status.name,
     "payment" to payment?.toRemoteMap(),
+    "cancelReason" to cancelReason,
     "updatedAt" to updatedAt,
 )
 
@@ -127,6 +128,7 @@ fun Map<String, Any?>.toViolation(id: String): Violation? {
         issuedAt = issuedAt,
         status = enumValueOrDefault(this["status"] as? String, ViolationStatus.PENDING),
         payment = payment,
+        cancelReason = this["cancelReason"] as? String,
         syncState = SyncState.SYNCED,
         updatedAt = this["updatedAt"].asLong() ?: issuedAt,
     )
