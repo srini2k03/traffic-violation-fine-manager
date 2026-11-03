@@ -40,4 +40,13 @@ class DashboardStatsTest {
         assertEquals(false, ViolationFilter(fromMillis = 501).matches(v))
         assertEquals(false, ViolationFilter(toMillis = 500).matches(v))
     }
+
+    @Test
+    fun `filter matches a challan number typed with its hyphens`() {
+        val v = TestData.violation(id = "1", issuedAt = 500, plate = "TN09AB1234")
+        assertEquals(true, ViolationFilter(plateQuery = "EC-TN-20230915-4821-ABCDEF").matches(v))
+        assertEquals(true, ViolationFilter(plateQuery = "4821-abcdef").matches(v))
+        assertEquals(true, ViolationFilter(plateQuery = "ABCDEF").matches(v))
+        assertEquals(false, ViolationFilter(plateQuery = "EC-TN-20230915-4821-ZZZZZZ").matches(v))
+    }
 }
