@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// Evidence photos: officers/admins only, images only, max 5 MB, append-only for officers.
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isStaff() {
+      return request.auth != null && request.auth.token.role in ['officer', 'admin'];
+    }
+
+    function isAdmin() {
+      return request.auth != null && request.auth.token.role == 'admin';
+    }
+
+    function isValidImage() {
+      return request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    match /evidence/{violationId}/{fileName} {
+      allow read: if isStaff();
+      allow create: if isStaff() && isValidImage() && fileName.matches('[A-Za-z0-9_.-]{1,100}');
+      // A retry after a dropped connection may overwrite its own upload shortly after creation.
+      allow update: if isStaff() && isValidImage()
+        && request.time < resource.timeCreated + duration.value(1, 'h');
+      allow delete: if isAdmin();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

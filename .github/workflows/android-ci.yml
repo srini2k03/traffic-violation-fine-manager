@@ -1,0 +1,56 @@
+name: Android CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Lint & unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Validate Firebase rules JSON
+        run: python3 -m json.tool firebase/database.rules.json > /dev/null
+
+      # google-services.json is never committed. The Google Services plugin is only
+      # applied when the file exists (see app/build.gradle.kts), so CI needs no secrets.
+      # If you prefer to exercise the plugin, store the file base64-encoded in the
+      # GOOGLE_SERVICES_JSON secret and it will be restored here.
+      - name: Restore google-services.json (optional)
+        if: ${{ env.GOOGLE_SERVICES_JSON != '' }}
+        run: echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
+
+      - name: Lint and unit tests
+        run: ./gradlew lint testDebugUnitTest :domain:test --stacktrace
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
+          retention-days: 7

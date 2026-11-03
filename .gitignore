@@ -37,3 +37,4 @@ storage-debug.log
 # OS
 .DS_Store
 Thumbs.db
+node_modules/

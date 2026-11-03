@@ -1,0 +1,54 @@
+{
+  "officers": {
+    "uid_priya": {
+      "name": "Insp. Priya Raman",
+      "badgeNumber": "TNP-4821",
+      "station": "Adyar Traffic",
+      "active": true
+    }
+  },
+  "violations": {
+    "3f1c9a2e-7b1d-4c55-9d0e-1a2b3c4d5e6f": {
+      "challanNumber": "EC-TN-20230915-4821-K7Q2XM",
+      "vehicleNumber": "TN09AB1234",
+      "offenderName": "Ravi Kumar",
+      "offenderPhone": "9876543210",
+      "fine": {
+        "total": 6500,
+        "lines": {
+          "NO_LICENCE": {
+            "title": "Driving without a valid licence",
+            "section": "181",
+            "baseAmount": 5000,
+            "priorOffences": 0,
+            "multiplierPercent": 100,
+            "amount": 5000
+          },
+          "NO_HELMET": {
+            "title": "Riding without helmet",
+            "section": "194D",
+            "baseAmount": 1000,
+            "priorOffences": 1,
+            "multiplierPercent": 150,
+            "amount": 1500
+          }
+        }
+      },
+      "location": { "lat": 13.0067, "lng": 80.257, "accuracy": 8.5, "address": "LB Road, Adyar, Chennai" },
+      "evidencePhotoUrl": "https://firebasestorage.googleapis.com/v0/b/YOUR-PROJECT.appspot.com/o/evidence%2F3f1c9a2e%2FEVD_20230915.jpg?alt=media",
+      "notes": "Stopped at Adyar signal; rider without helmet, no DL produced.",
+      "officerId": "uid_priya",
+      "officerName": "Insp. Priya Raman",
+      "officerBadge": "TNP-4821",
+      "issuedAt": 1694752200000,
+      "status": "PAID",
+      "payment": { "mode": "UPI", "reference": "UPI-778123456", "paidAt": 1694755800000, "collectedBy": "uid_priya" },
+      "updatedAt": 1694755800000
+    }
+  },
+  "officerLogs": {
+    "uid_priya": {
+      "log_9b1e4d": { "action": "VIOLATION_ISSUED", "details": "EC-TN-20230915-4821-K7Q2XM · TN 09 AB 1234 · ₹6500", "referenceId": "3f1c9a2e-7b1d-4c55-9d0e-1a2b3c4d5e6f", "timestamp": 1694752201000 }
+    }
+  }
+}
