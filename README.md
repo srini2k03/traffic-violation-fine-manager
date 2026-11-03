@@ -187,7 +187,8 @@ Realtime Database tree (see [`firebase/sample-data.json`](firebase/sample-data.j
 }
 ```
 
-Storage: `evidence/{violationId}/{file}.jpg` (down-sampled to ≤1600 px, JPEG 80 before upload).
+Storage: `evidence/{violationId}/{file}.jpg` (re-encoded as JPEG 80 before upload; photos 3,200 px or more on the
+longest side are first down-sampled by a power of two, so every upload is under 3,200 px).
 
 Locally, Room mirrors `violations` (plus a `pendingOp` column: `CREATE` / `UPDATE_PAYMENT` / `null`) and `officer_logs` (plus `pending`).
 
