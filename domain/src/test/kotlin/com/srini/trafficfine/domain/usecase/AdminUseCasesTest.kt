@@ -78,6 +78,17 @@ class AdminUseCasesTest {
     }
 
     @Test
+    fun `a maximum-length cancel reason still yields a log entry the rules accept`() = runTest {
+        coEvery { violations.getViolation("v1") } returns TestData.violation("v1", issuedAt = 0)
+        val reason = "x".repeat(CancelViolationUseCase.MAX_REASON_LENGTH)
+
+        assertTrue(CancelViolationUseCase(violations, time, record)(TestData.admin, "v1", reason).isSuccess)
+
+        // database.rules.json: officerLogs/$uid/$logId/details must be at most 200 characters.
+        coVerify { logs.record(match { it.action == LogAction.CHALLAN_CANCELLED && it.details.length <= 200 }) }
+    }
+
+    @Test
     fun `paid challans cannot be cancelled`() = runTest {
         coEvery { violations.getViolation("v1") } returns TestData.violation("v1", issuedAt = 0, status = ViolationStatus.PAID)
         val result = CancelViolationUseCase(violations, time, record)(TestData.admin, "v1", "Duplicate entry")
