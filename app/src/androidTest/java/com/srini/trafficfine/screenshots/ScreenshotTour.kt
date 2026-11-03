@@ -9,9 +9,9 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
@@ -21,6 +21,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.srini.trafficfine.MainActivity
 import com.srini.trafficfine.ui.dashboard.DASHBOARD_LIST_TAG
+import com.srini.trafficfine.ui.dashboard.ISSUE_FAB_TAG
 import com.srini.trafficfine.ui.history.HISTORY_ROW_TAG
 import com.srini.trafficfine.ui.issue.PLATE_FIELD_TAG
 import com.srini.trafficfine.ui.login.LoginTestTags
@@ -59,12 +60,12 @@ class ScreenshotTour {
         composeRule.waitUntilAtLeastOneExists(hasText("Recent challans"), TIMEOUT)
         capture("dashboard")
 
-        composeRule.onNodeWithText("Issue challan").performClick()
+        composeRule.onNodeWithTag(ISSUE_FAB_TAG).performClick()
         composeRule.waitUntilAtLeastOneExists(hasTestTag(PLATE_FIELD_TAG), TIMEOUT)
         composeRule.onNodeWithTag(PLATE_FIELD_TAG).performTextInput("TN09AB1234")
         Espresso.closeSoftKeyboard()
-        composeRule.onNodeWithText("Riding without helmet", substring = true).performClick()
-        composeRule.onNodeWithText("Driving without seat belt", substring = true).performClick()
+        clickText("Riding without helmet")
+        clickText("Driving without seat belt")
         composeRule.waitUntilAtLeastOneExists(hasText("Adyar", substring = true), TIMEOUT)
         composeRule.waitUntilAtLeastOneExists(hasText("Total fine"), TIMEOUT)
         capture("issue")
@@ -72,7 +73,7 @@ class ScreenshotTour {
 
         composeRule.waitUntilAtLeastOneExists(hasTestTag(DASHBOARD_LIST_TAG), TIMEOUT)
         composeRule.onNodeWithTag(DASHBOARD_LIST_TAG).performScrollToNode(hasText("History"))
-        composeRule.onNodeWithText("History").performClick()
+        clickText("History", substring = false)
         composeRule.waitUntilAtLeastOneExists(hasTestTag(HISTORY_ROW_TAG), TIMEOUT)
         capture("history")
 
@@ -86,10 +87,20 @@ class ScreenshotTour {
         composeRule.waitUntilAtLeastOneExists(hasTestTag(DASHBOARD_LIST_TAG), TIMEOUT)
         val adminButton = hasText("Admin console", substring = true)
         composeRule.onNodeWithTag(DASHBOARD_LIST_TAG).performScrollToNode(adminButton)
-        composeRule.onNode(adminButton).performClick()
+        clickText("Admin console")
         composeRule.waitUntilAtLeastOneExists(hasText("Analytics"), TIMEOUT)
         composeRule.waitUntilAtLeastOneExists(hasContentDescription("Daily fines chart", substring = true), TIMEOUT)
         capture("admin")
+    }
+
+    /** Clicks the node showing [text], falling back to the unmerged tree when a parent clears its semantics. */
+    private fun clickText(text: String, substring: Boolean = true) {
+        val merged = composeRule.onAllNodesWithText(text, substring = substring).fetchSemanticsNodes()
+        if (merged.isNotEmpty()) {
+            composeRule.onAllNodesWithText(text, substring = substring).onFirst().performClick()
+        } else {
+            composeRule.onAllNodesWithText(text, substring = substring, useUnmergedTree = true).onFirst().performClick()
+        }
     }
 
     private fun capture(name: String) {

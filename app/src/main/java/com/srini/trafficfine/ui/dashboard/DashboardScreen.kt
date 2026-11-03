@@ -98,6 +98,7 @@ fun DashboardScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onIssueViolation,
+                modifier = Modifier.testTag(ISSUE_FAB_TAG),
                 icon = { Icon(Icons.Filled.AddCircle, contentDescription = null) },
                 text = { Text("Issue challan") },
             )
@@ -254,3 +255,4 @@ private fun DemoBanner() {
 
 /** Test tag on the dashboard list (used by the screenshot tour). */
 const val DASHBOARD_LIST_TAG = "dashboard_list"
+const val ISSUE_FAB_TAG = "dashboard_issue_fab"
