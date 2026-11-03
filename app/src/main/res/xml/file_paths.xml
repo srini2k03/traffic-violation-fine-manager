@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Evidence photos captured with the camera (app-private, shared only with the camera app). -->
+    <files-path name="evidence" path="evidence/" />
+    <!-- Generated e-challan PDFs shared with the offender via the share sheet. -->
+    <cache-path name="challans" path="challans/" />
+</paths>
