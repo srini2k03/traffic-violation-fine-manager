@@ -1,0 +1,116 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "officers": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'admin')",
+        ".write": "auth != null && auth.token.role === 'admin'",
+        ".validate": "newData.hasChildren(['name', 'badgeNumber', 'station'])",
+        "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80" },
+        "badgeNumber": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 20" },
+        "station": { ".validate": "newData.isString() && newData.val().length <= 80" },
+        "active": { ".validate": "newData.isBoolean()" },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "violations": {
+      ".read": "auth != null && (auth.token.role === 'officer' || auth.token.role === 'admin')",
+      ".indexOn": ["vehicleNumber", "officerId", "updatedAt", "issuedAt", "challanNumber"],
+
+      "$violationId": {
+        ".write": "auth != null && (auth.token.role === 'admin' || (auth.token.role === 'officer' && !data.exists() && newData.child('officerId').val() === auth.uid))",
+        ".validate": "newData.hasChildren(['challanNumber', 'vehicleNumber', 'fine', 'officerId', 'issuedAt', 'status', 'updatedAt'])",
+
+        "challanNumber": {
+          ".validate": "newData.isString() && newData.val().matches(/^EC-[A-Z0-9]{2}-[0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{6}$/) && (!data.exists() || data.val() === newData.val())"
+        },
+        "vehicleNumber": {
+          ".validate": "newData.isString() && newData.val().matches(/^([A-Z]{2}[0-9]{1,2}[A-Z]{0,3}[0-9]{4}|[0-9]{2}BH[0-9]{4}[A-Z]{1,2})$/)"
+        },
+        "offenderName": { ".validate": "newData.isString() && newData.val().length <= 80" },
+        "offenderPhone": { ".validate": "newData.isString() && newData.val().matches(/^[6-9][0-9]{9}$/)" },
+
+        "fine": {
+          ".validate": "newData.hasChildren(['total', 'lines'])",
+          "total": { ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() <= 1000000" },
+          "lines": {
+            "$code": {
+              ".validate": "newData.hasChildren(['title', 'section', 'baseAmount', 'priorOffences', 'multiplierPercent', 'amount'])",
+              "title": { ".validate": "newData.isString()" },
+              "section": { ".validate": "newData.isString()" },
+              "baseAmount": { ".validate": "newData.isNumber() && newData.val() > 0" },
+              "priorOffences": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+              "multiplierPercent": { ".validate": "newData.isNumber() && newData.val() >= 100 && newData.val() <= 500" },
+              "amount": { ".validate": "newData.isNumber() && newData.val() >= newData.parent().child('baseAmount').val()" },
+              "$other": { ".validate": false }
+            }
+          },
+          "$other": { ".validate": false }
+        },
+
+        "location": {
+          ".validate": "newData.hasChildren(['lat', 'lng'])",
+          "lat": { ".validate": "newData.isNumber() && newData.val() >= -90 && newData.val() <= 90" },
+          "lng": { ".validate": "newData.isNumber() && newData.val() >= -180 && newData.val() <= 180" },
+          "accuracy": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+          "address": { ".validate": "newData.isString() && newData.val().length <= 300" },
+          "$other": { ".validate": false }
+        },
+
+        "evidencePhotoUrl": {
+          ".validate": "newData.isString() && newData.val().beginsWith('https://firebasestorage.googleapis.com/')"
+        },
+        "notes": { ".validate": "newData.isString() && newData.val().length <= 500" },
+        "officerId": { ".validate": "newData.isString() && (!data.exists() || data.val() === newData.val())" },
+        "officerName": { ".validate": "newData.isString() && newData.val().length <= 80" },
+        "officerBadge": { ".validate": "newData.isString() && newData.val().length <= 20" },
+        "issuedAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now + 300000 && (!data.exists() || data.val() === newData.val())"
+        },
+
+        "status": {
+          ".write": "auth != null && (auth.token.role === 'officer' || auth.token.role === 'admin') && data.val() === 'PENDING' && newData.val() === 'PAID'",
+          ".validate": "newData.isString() && newData.val().matches(/^(PENDING|PAID|CANCELLED)$/)"
+        },
+
+        "payment": {
+          ".write": "auth != null && (auth.token.role === 'officer' || auth.token.role === 'admin') && !data.exists() && root.child('violations').child($violationId).child('status').val() === 'PENDING'",
+          ".validate": "newData.hasChildren(['mode', 'reference', 'paidAt', 'collectedBy']) && (newData.child('collectedBy').val() === auth.uid || auth.token.role === 'admin')",
+          "mode": { ".validate": "newData.isString() && newData.val().matches(/^(CASH|UPI|CARD|ONLINE)$/)" },
+          "reference": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40" },
+          "paidAt": { ".validate": "newData.isNumber() && newData.val() <= now + 300000" },
+          "collectedBy": { ".validate": "newData.isString()" },
+          "$other": { ".validate": false }
+        },
+
+        "updatedAt": {
+          ".write": "auth != null && (auth.token.role === 'officer' || auth.token.role === 'admin') && data.exists() && root.child('violations').child($violationId).child('status').val() === 'PENDING'",
+          ".validate": "newData.isNumber() && newData.val() <= now + 300000 && (!data.exists() || newData.val() >= data.val())"
+        },
+
+        "$other": { ".validate": false }
+      }
+    },
+
+    "officerLogs": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'admin')",
+        ".indexOn": ["timestamp"],
+        "$logId": {
+          ".write": "auth != null && auth.uid === $uid && !data.exists() && (auth.token.role === 'officer' || auth.token.role === 'admin')",
+          ".validate": "newData.hasChildren(['action', 'details', 'timestamp'])",
+          "action": {
+            ".validate": "newData.isString() && newData.val().matches(/^(SIGN_IN|SIGN_OUT|VIOLATION_ISSUED|FINE_PAID|CHALLAN_SHARED|SYNC_COMPLETED)$/)"
+          },
+          "details": { ".validate": "newData.isString() && newData.val().length <= 200" },
+          "referenceId": { ".validate": "newData.isString()" },
+          "timestamp": { ".validate": "newData.isNumber() && newData.val() <= now + 300000" },
+          "$other": { ".validate": false }
+        }
+      }
+    }
+  }
+}

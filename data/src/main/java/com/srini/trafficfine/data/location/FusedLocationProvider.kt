@@ -38,20 +38,7 @@ class FusedLocationProvider @Inject constructor(
     @SuppressLint("MissingPermission") // checked in hasPermission()
     override suspend fun currentLocation(): GeoPoint? {
         if (!hasPermission()) return null
-        val location = try {
-            val cts = CancellationTokenSource()
-            try {
-                withTimeoutOrNull(FIX_TIMEOUT_MS) {
-                    client.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cts.token).await()
-                } ?: client.lastLocation.await()
-            } finally {
-                cts.cancel()
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            null
-        } ?: return null
+        val location: Location = fetchLocation() ?: return null
 
         return GeoPoint(
             latitude = location.latitude,
@@ -59,6 +46,23 @@ class FusedLocationProvider @Inject constructor(
             accuracyMeters = if (location.hasAccuracy()) location.accuracy else null,
             address = reverseGeocode(location),
         )
+    }
+
+    @SuppressLint("MissingPermission") // only called after hasPermission()
+    private suspend fun fetchLocation(): Location? {
+        val cts = CancellationTokenSource()
+        return try {
+            val fresh: Location? = withTimeoutOrNull(FIX_TIMEOUT_MS) {
+                client.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cts.token).await()
+            }
+            fresh ?: client.lastLocation.await()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        } finally {
+            cts.cancel()
+        }
     }
 
     private fun hasPermission(): Boolean =

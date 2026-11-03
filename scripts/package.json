@@ -1,0 +1,12 @@
+{
+  "name": "traffic-fine-admin-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Admin helpers for provisioning officer accounts",
+  "scripts": {
+    "set-role": "node set-role.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}
