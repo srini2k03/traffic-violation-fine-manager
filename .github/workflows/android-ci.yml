@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-    name: Lint & unit tests
+    name: Build, lint & unit tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -42,8 +42,15 @@ jobs:
         if: ${{ env.GOOGLE_SERVICES_JSON != '' }}
         run: echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
 
-      - name: Lint and unit tests
-        run: ./gradlew lint testDebugUnitTest :domain:test --stacktrace
+      - name: Build debug APK, lint and unit tests
+        run: ./gradlew assembleDebug lint testDebugUnitTest :domain:test --stacktrace
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 30
 
       - name: Upload reports
         if: always()
