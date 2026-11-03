@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>e-Challan · Traffic Fine Manager</title>
+  <meta name="description" content="A native Android app for traffic police to issue digital violation notices (e-challans) in real time, even offline. Kotlin, Jetpack Compose, Room and Firebase.">
+  <meta name="theme-color" content="#0b3d91" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
+  <meta property="og:title" content="e-Challan · Traffic Fine Manager">
+  <meta property="og:description" content="Issue digital e-challans in seconds, even offline. Open-source Android app built with Kotlin, Compose and Firebase.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://srini2k03.github.io/traffic-violation-fine-manager/">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    try {
+      var saved = localStorage.getItem('theme');
+      if (saved === 'light' || saved === 'dark') document.documentElement.setAttribute('data-theme', saved);
+    } catch (e) { /* storage unavailable: follow the system theme */ }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="#top" aria-label="e-Challan home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8" fill="#0b3d91"/>
+          <rect x="11" y="5" width="10" height="22" rx="3" fill="#fff"/>
+          <circle cx="16" cy="10" r="2.6" fill="#e53935"/>
+          <circle cx="16" cy="16" r="2.6" fill="#ffb300"/>
+          <circle cx="16" cy="22" r="2.6" fill="#43a047"/>
+        </svg>
+        <span>e-Challan</span>
+      </a>
+      <nav class="nav-links" aria-label="Sections">
+        <a href="#features">Features</a>
+        <a href="#screens">Screens</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#data">Data &amp; rules</a>
+        <a href="#stack">Stack</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
+        </button>
+        <a class="icon-btn" href="https://github.com/srini2k03/traffic-violation-fine-manager" aria-label="Source code on GitHub">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="filled"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Android · Kotlin · Jetpack Compose · Firebase</p>
+          <h1>Digital e-challans, issued in seconds. <span class="accent">Even offline.</span></h1>
+          <p class="lead">
+            A native app for traffic police officers: validate the plate, pick the offences, attach GPS and photo
+            evidence, and hand over a QR-coded PDF challan. Repeat offenders are priced automatically, and every
+            record syncs to Firebase when the network returns.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" id="download-apk"
+               href="https://github.com/srini2k03/traffic-violation-fine-manager/releases/latest/download/traffic-fine-manager.apk">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>
+              Download APK
+            </a>
+            <a class="btn btn-ghost" href="https://github.com/srini2k03/traffic-violation-fine-manager">View source</a>
+          </div>
+          <p class="fine-print">
+            Latest build from <code>main</code> · Android 7.0+ · debug-signed, for evaluation only.
+            No account needed: tap <strong>Try the demo</strong> on the login screen.
+            <a href="https://github.com/srini2k03/traffic-violation-fine-manager/releases">All releases</a>
+          </p>
+        </div>
+        <div class="hero-visual">
+          <div class="phone phone-hero">
+            <div class="phone-screen">
+              <img id="hero-shot" src="assets/placeholders/dashboard.svg" width="360" height="800"
+                   alt="Dashboard screen of the e-Challan app showing today's challans, fines and recent records">
+            </div>
+          </div>
+          <div class="floating-card fc-1" aria-hidden="true">
+            <span class="dot dot-green"></span> Synced to Firebase
+          </div>
+          <div class="floating-card fc-2" aria-hidden="true">
+            Repeat offence <strong>×1.5</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="facts" aria-label="Key facts">
+      <div class="container facts-grid">
+        <div><strong>13</strong><span>offences from the MV Act, 2019</span></div>
+        <div><strong>3</strong><span>Clean Architecture modules</span></div>
+        <div><strong>0</strong><span>network calls needed to issue a challan</span></div>
+        <div><strong>24+</strong><span>minimum Android API level</span></div>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Features</p>
+          <h2>Everything an officer needs on the road</h2>
+          <p>Built for patchy networks, busy junctions and auditors who want every rupee accounted for.</p>
+        </header>
+        <div class="feature-grid">
+          <article class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 12h2M11 12h6"/></svg></div>
+            <h3>Plate validation</h3>
+            <p>Indian state series (including Delhi-style <code>DL 3C AF 0001</code>) and Bharat series <code>22 BH 1234 AB</code>, normalised as you type.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/></svg></div>
+            <h3>Repeat-offender pricing</h3>
+            <p>Integer-rupee calculator escalates ×1.0 → ×1.5 → ×2.0 for prior offences in 365 days, with a per-line cap and a live preview.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg></div>
+            <h3>GPS &amp; photo evidence</h3>
+            <p>Fused location with reverse geocoding and a camera capture via the Activity Result API, down-sampled before upload.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg></div>
+            <h3>QR-coded PDF challan</h3>
+            <p>A4 challan and receipt rendered with <code>PdfDocument</code>, a ZXing QR that carries no personal data, shared through <code>FileProvider</code>.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2M21 12a9 9 0 0 1-15.5 6.2"/><path d="M18 2v4h-4M6 22v-4h4"/></svg></div>
+            <h3>Offline-first sync</h3>
+            <p>Room is the source of truth. Writes are queued and pushed by a Hilt WorkManager worker with backoff and optimistic concurrency.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <h3>Role-based security</h3>
+            <p>Officer and admin roles are Firebase custom claims set only with the Admin SDK. The rules validate every field and enforce create-only records.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+            <h3>Admin analytics</h3>
+            <p>7, 30 and 90-day analytics drawn on a Compose Canvas, plus an officer directory with activation controls and challan cancellation.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg></div>
+            <h3>History &amp; audit log</h3>
+            <p>Search by plate or challan number, filter by status and date range, and keep an append-only officer activity log.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section demo-callout" aria-labelledby="demo-title">
+      <div class="container demo-grid">
+        <div>
+          <p class="eyebrow">Demo mode</p>
+          <h2 id="demo-title">Explore it without a Firebase project</h2>
+          <p>
+            The APK works out of the box. <strong>Try the demo</strong> signs you in locally as a station admin
+            (or as a field officer) and seeds a month of realistic challans into Room: repeat offenders,
+            paid, pending and cancelled records, and a full activity log. Demo data never leaves the device
+            and is deleted when you sign out.
+          </p>
+        </div>
+        <ol class="steps">
+          <li><span>1</span><div><strong>Install</strong> the APK. You may need to allow installs from your browser.</div></li>
+          <li><span>2</span><div><strong>Tap “Try the demo”</strong> on the login screen.</div></li>
+          <li><span>3</span><div><strong>Issue a challan</strong>, share its PDF, mark it paid, then open the admin console.</div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="screens" class="section">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Screens</p>
+          <h2>Real screens, captured on an emulator in CI</h2>
+          <p id="shots-status">Previews are shown until the next CI run publishes real screenshots.</p>
+        </header>
+        <div class="gallery">
+          <div class="gallery-stage">
+            <div class="phone">
+              <div class="phone-screen">
+                <img id="gallery-shot" src="assets/placeholders/login.svg" width="360" height="800" alt="">
+              </div>
+            </div>
+          </div>
+          <div class="gallery-side">
+            <div class="gallery-tabs" role="tablist" aria-label="App screens" id="gallery-tabs"></div>
+            <div class="gallery-caption" id="gallery-caption" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture" class="section section-alt">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Architecture</p>
+          <h2>Clean Architecture in three Gradle modules</h2>
+          <p>The domain is pure Kotlin with no Android dependency, so the business rules run as fast JVM tests.</p>
+        </header>
+        <figure class="diagram-wrap">
+          <div class="diagram-scroll" tabindex="0" aria-label="Architecture diagram, scrollable">
+            <svg class="diagram" viewBox="0 0 1000 520" role="img" aria-labelledby="arch-title arch-desc">
+              <title id="arch-title">Module architecture</title>
+              <desc id="arch-desc">The app module's Compose screens and ViewModels call use cases in the pure-Kotlin domain module. The data module implements the domain repository interfaces with Room, a WorkManager sync engine and Firebase Authentication, Realtime Database and Cloud Storage.</desc>
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 10 5 0 10z" class="d-arrowhead"/>
+                </marker>
+              </defs>
+
+              <g class="lane">
+                <rect x="10" y="10" width="230" height="500" rx="18" class="d-lane d-lane-app"/>
+                <text x="125" y="44" class="d-lane-title">:app</text>
+                <text x="125" y="64" class="d-lane-sub">presentation</text>
+              </g>
+              <g class="lane">
+                <rect x="260" y="10" width="230" height="500" rx="18" class="d-lane d-lane-domain"/>
+                <text x="375" y="44" class="d-lane-title">:domain</text>
+                <text x="375" y="64" class="d-lane-sub">pure Kotlin</text>
+              </g>
+              <g class="lane">
+                <rect x="510" y="10" width="230" height="500" rx="18" class="d-lane d-lane-data"/>
+                <text x="625" y="44" class="d-lane-title">:data</text>
+                <text x="625" y="64" class="d-lane-sub">Android library</text>
+              </g>
+              <g class="lane">
+                <rect x="760" y="10" width="230" height="500" rx="18" class="d-lane d-lane-fb"/>
+                <text x="875" y="44" class="d-lane-title">Firebase</text>
+                <text x="875" y="64" class="d-lane-sub">backend</text>
+              </g>
+
+              <g class="d-box"><rect x="30" y="90" width="190" height="96" rx="12"/>
+                <text x="125" y="120" class="d-strong">Compose screens</text>
+                <text x="125" y="142">Login · Dashboard · Issue</text>
+                <text x="125" y="160">History · Detail · Admin</text></g>
+              <g class="d-box"><rect x="30" y="230" width="190" height="78" rx="12"/>
+                <text x="125" y="262" class="d-strong">ViewModels</text>
+                <text x="125" y="284">StateFlow UI state</text></g>
+              <g class="d-box"><rect x="30" y="352" width="190" height="78" rx="12"/>
+                <text x="125" y="384" class="d-strong">Hilt DI</text>
+                <text x="125" y="406">Navigation Compose</text></g>
+
+              <g class="d-box"><rect x="280" y="90" width="190" height="96" rx="12"/>
+                <text x="375" y="120" class="d-strong">Use cases</text>
+                <text x="375" y="142">SignIn · IssueViolation</text>
+                <text x="375" y="160">MarkFinePaid · StartDemo</text></g>
+              <g class="d-box"><rect x="280" y="230" width="190" height="96" rx="12"/>
+                <text x="375" y="260" class="d-strong">Business rules</text>
+                <text x="375" y="282">VehicleNumberValidator</text>
+                <text x="375" y="300">FineCalculator · ChallanQr</text></g>
+              <g class="d-box d-iface"><rect x="280" y="370" width="190" height="96" rx="12"/>
+                <text x="375" y="400" class="d-strong">Repository interfaces</text>
+                <text x="375" y="422">Auth · Violation · Sync</text>
+                <text x="375" y="440">Location · Demo</text></g>
+
+              <g class="d-box"><rect x="530" y="90" width="190" height="96" rx="12"/>
+                <text x="625" y="120" class="d-strong">Repositories</text>
+                <text x="625" y="142">OfflineFirstViolation</text>
+                <text x="625" y="160">DemoAwareAuth</text></g>
+              <g class="d-box d-store"><rect x="530" y="210" width="190" height="78" rx="12"/>
+                <text x="625" y="242" class="d-strong">Room</text>
+                <text x="625" y="264">violations · officer_logs</text></g>
+              <g class="d-box"><rect x="530" y="312" width="190" height="78" rx="12"/>
+                <text x="625" y="344" class="d-strong">SyncEngine</text>
+                <text x="625" y="366">WorkManager worker</text></g>
+              <g class="d-box"><rect x="530" y="414" width="190" height="78" rx="12"/>
+                <text x="625" y="446" class="d-strong">Device</text>
+                <text x="625" y="468">Location · PDF · ZXing</text></g>
+
+              <g class="d-box d-fb"><rect x="780" y="90" width="190" height="78" rx="12"/>
+                <text x="875" y="122" class="d-strong">Authentication</text>
+                <text x="875" y="144">role custom claim</text></g>
+              <g class="d-box d-fb"><rect x="780" y="230" width="190" height="78" rx="12"/>
+                <text x="875" y="262" class="d-strong">Realtime Database</text>
+                <text x="875" y="284">offline persistence</text></g>
+              <g class="d-box d-fb"><rect x="780" y="352" width="190" height="78" rx="12"/>
+                <text x="875" y="384" class="d-strong">Cloud Storage</text>
+                <text x="875" y="406">evidence photos</text></g>
+
+              <g class="d-edges">
+                <path d="M125 186v44" marker-end="url(#arrow)"/>
+                <path d="M220 262h30q10 0 10-10V148q0-10 10-10h10" marker-end="url(#arrow)"/>
+                <path d="M375 186v44" marker-end="url(#arrow)"/>
+                <path d="M375 326v44" marker-end="url(#arrow)"/>
+                <path d="M530 138h-30q-10 0-10 10v260q0 10-10 10h-10" class="d-dashed" marker-end="url(#arrow)"/>
+                <path d="M625 186v24" marker-end="url(#arrow)"/>
+                <path d="M625 312v-24" marker-end="url(#arrow)"/>
+                <path d="M720 120h60" marker-end="url(#arrow)"/>
+                <path d="M720 340h20q10 0 10-10v-52q0-10 10-10h20" marker-end="url(#arrow)"/>
+                <path d="M720 360h30q10 0 10 10v14q0 10 10 10h10" marker-end="url(#arrow)"/>
+              </g>
+              <text x="503" y="300" class="d-note" transform="rotate(-90 503 300)">implements</text>
+            </svg>
+          </div>
+          <figcaption>Arrows show calls. The dashed arrow is “implements”: <code>:data</code> provides the interfaces that <code>:domain</code> declares.</figcaption>
+        </figure>
+
+        <div class="flow">
+          <h3>Issuing a challan, step by step</h3>
+          <ol class="flow-steps">
+            <li><strong>Validate</strong> the plate, offences, phone number and photo evidence before anything is saved.</li>
+            <li><strong>Price</strong> it: prior offences are looked up remotely (4 s timeout) and merged with the local cache.</li>
+            <li><strong>Save</strong> to Room with <code>pendingOp = CREATE</code> and log the action.</li>
+            <li><strong>Share</strong> the QR-coded PDF straight away. No network needed.</li>
+            <li><strong>Sync</strong>: WorkManager uploads evidence, writes <code>/violations/{id}</code> and marks the row synced.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section id="data" class="section">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Data &amp; security</p>
+          <h2>Firebase data model and security rules</h2>
+          <p>Default-deny rules, roles from custom claims, and field-level validation on every write.</p>
+        </header>
+        <div class="data-grid">
+          <div class="card code-card">
+            <div class="card-head"><span>Realtime Database</span><code>firebase/sample-data.json</code></div>
+<pre><code><span class="k">"officers"</span>: {
+  <span class="k">"&lt;uid&gt;"</span>: { name, email, <span class="k">role</span>, badgeNumber, station, active }
+},
+<span class="k">"violations"</span>: {
+  <span class="k">"&lt;id&gt;"</span>: {
+    challanNumber: <span class="s">"EC-TN-20230915-4821-K7Q2XM"</span>,
+    vehicleNumber: <span class="s">"TN09AB1234"</span>,
+    offenderName, offenderPhone,
+    fine: { total: <span class="n">6500</span>, lines: {
+      <span class="k">NO_HELMET</span>: { section: <span class="s">"194D"</span>, baseAmount: <span class="n">1000</span>,
+                   priorOffences: <span class="n">1</span>, multiplierPercent: <span class="n">150</span>,
+                   amount: <span class="n">1500</span> } } },
+    location: { lat, lng, accuracy, address },
+    evidencePhotoUrl, notes,
+    officerId, officerName, officerBadge, issuedAt,
+    status: <span class="s">"PENDING | PAID | CANCELLED"</span>,
+    payment: { mode, reference, paidAt, collectedBy },
+    cancelReason, updatedAt
+  }
+},
+<span class="k">"officerLogs"</span>: {
+  <span class="k">"&lt;uid&gt;"</span>: { <span class="k">"&lt;logId&gt;"</span>: { action, details, referenceId, timestamp } }
+}</code></pre>
+            <p class="card-foot">Evidence lives in Cloud Storage at <code>evidence/{violationId}/{file}.jpg</code>. Room mirrors <code>violations</code> and <code>officer_logs</code> locally with a pending-operation marker.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><span>Security rules</span><code>firebase/database.rules.json</code></div>
+            <div class="table-scroll">
+              <table class="rules">
+                <thead><tr><th scope="col">Path</th><th scope="col">Read</th><th scope="col">Write</th></tr></thead>
+                <tbody>
+                  <tr><td data-label="Path"><code>/</code></td><td data-label="Read">denied</td><td data-label="Write">denied (default deny)</td></tr>
+                  <tr><td data-label="Path"><code>/officers/{uid}</code></td><td data-label="Read">self or admin</td><td data-label="Write">admins only</td></tr>
+                  <tr><td data-label="Path"><code>/violations</code></td><td data-label="Read">officers &amp; admins (indexed)</td><td data-label="Write">n/a</td></tr>
+                  <tr><td data-label="Path"><code>/violations/{id}</code></td><td data-label="Read">n/a</td><td data-label="Write">create-only by an active officer for themself; admins may edit or cancel</td></tr>
+                  <tr><td data-label="Path"><code>…/status</code></td><td data-label="Read">n/a</td><td data-label="Write"><code>PENDING → PAID</code> only</td></tr>
+                  <tr><td data-label="Path"><code>…/payment</code></td><td data-label="Read">n/a</td><td data-label="Write">once, while pending, <code>collectedBy</code> = caller</td></tr>
+                  <tr><td data-label="Path"><code>/officerLogs/{uid}/{id}</code></td><td data-label="Read">owner or admin</td><td data-label="Write">owner, append-only</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <ul class="checklist">
+              <li>Roles come from <code>auth.token.role</code>, set with the Admin SDK only.</li>
+              <li>Plate regex, challan format, enums, ranges and string lengths validated.</li>
+              <li><code>challanNumber</code>, <code>officerId</code> and <code>issuedAt</code> are immutable.</li>
+              <li>Unknown keys rejected with <code>$other: false</code>.</li>
+              <li>Storage: images under 5 MB, safe names, admin-only delete.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="stack" class="section section-alt">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Tech stack</p>
+          <h2>Modern Android, end to end</h2>
+        </header>
+        <div class="stack-grid">
+          <div class="stack-group"><h3>Language &amp; build</h3><ul class="chips"><li>Kotlin 2.1</li><li>Gradle Kotlin DSL</li><li>Version catalog</li><li>AGP 8.7</li><li>KSP</li></ul></div>
+          <div class="stack-group"><h3>UI</h3><ul class="chips"><li>Jetpack Compose</li><li>Material 3</li><li>Navigation Compose</li><li>Coil</li><li>Canvas charts</li></ul></div>
+          <div class="stack-group"><h3>Architecture</h3><ul class="chips"><li>Clean Architecture</li><li>MVVM</li><li>Hilt</li><li>Coroutines &amp; Flow</li></ul></div>
+          <div class="stack-group"><h3>Backend</h3><ul class="chips"><li>Firebase Auth</li><li>Realtime Database</li><li>Cloud Storage</li><li>Custom claims</li></ul></div>
+          <div class="stack-group"><h3>Local &amp; device</h3><ul class="chips"><li>Room</li><li>WorkManager</li><li>Fused Location</li><li>PdfDocument</li><li>ZXing</li></ul></div>
+          <div class="stack-group"><h3>Quality &amp; delivery</h3><ul class="chips"><li>JUnit 4</li><li>MockK</li><li>Turbine</li><li>Compose UI tests</li><li>GitHub Actions</li></ul></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section get-started">
+      <div class="container gs-grid">
+        <div>
+          <p class="eyebrow">Get started</p>
+          <h2>Install it, or build it yourself</h2>
+          <p>Every push to <code>main</code> builds, lints and tests the app, publishes the APK to the rolling
+            <a href="https://github.com/srini2k03/traffic-violation-fine-manager/releases/tag/latest"><code>latest</code> release</a>
+            and refreshes the screenshots on this page.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="https://github.com/srini2k03/traffic-violation-fine-manager/releases/latest/download/traffic-fine-manager.apk">Download APK</a>
+            <a class="btn btn-ghost" href="https://github.com/srini2k03/traffic-violation-fine-manager#getting-started">Setup guide</a>
+          </div>
+        </div>
+        <div class="card code-card terminal">
+          <div class="card-head"><span>Terminal</span></div>
+<pre><code><span class="c"># clone and run the JVM tests (no Android SDK needed)</span>
+git clone https://github.com/srini2k03/traffic-violation-fine-manager
+cd traffic-violation-fine-manager
+./gradlew :domain:test
+
+<span class="c"># build and install the debug app (demo mode works without Firebase)</span>
+./gradlew installDebug
+
+<span class="c"># optional: real backend</span>
+cp ~/Downloads/google-services.json app/
+firebase deploy --only database,storage</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <p>© <span id="year">2026</span> Srinivasan Balasubramanian · MIT licence</p>
+      <p class="muted">Fine amounts are indicative values based on the Motor Vehicles (Amendment) Act, 2019 and are not legal advice.</p>
+      <p><a href="https://github.com/srini2k03/traffic-violation-fine-manager">github.com/srini2k03/traffic-violation-fine-manager</a></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
