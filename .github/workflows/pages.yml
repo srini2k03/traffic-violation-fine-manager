@@ -1,0 +1,100 @@
+name: Website
+
+# Captures real screenshots on an Android emulator, then publishes web/ (plus those
+# screenshots) to the gh-pages branch, served at
+# https://srini2k03.github.io/traffic-violation-fine-manager/
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    name: Emulator screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # No google-services.json here on purpose: the tour runs in demo mode.
+      - name: Build app and instrumentation APKs
+        run: ./gradlew assembleDebug assembleDebugAndroidTest --stacktrace
+
+      # Hardware acceleration for the x86_64 emulator (from the android-emulator-runner README).
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run screenshot tour on an API 34 emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: ./scripts/capture-screenshots.sh build/screenshots
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: build/screenshots/*.png
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy:
+    name: Deploy to gh-pages
+    needs: screenshots
+    # Still publish the site (with placeholder previews) if the emulator job fails.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download screenshots
+        if: needs.screenshots.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: screenshots
+          path: web/screenshots
+
+      - name: Write screenshot manifest
+        run: python3 scripts/make-screenshot-manifest.py web/screenshots "$GITHUB_SHA"
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: github-actions[bot]
+          user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          full_commit_message: Deploy site and screenshots for ${{ github.sha }}

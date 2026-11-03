@@ -3,12 +3,16 @@ name: Android CI
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
     branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -36,20 +40,30 @@ jobs:
 
       # google-services.json is never committed. The Google Services plugin is only
       # applied when the file exists (see app/build.gradle.kts), so CI needs no secrets.
-      # If you prefer to exercise the plugin, store the file base64-encoded in the
-      # GOOGLE_SERVICES_JSON secret and it will be restored here.
+      # Without it the APK runs in demo mode only. To ship a Firebase-enabled APK, store the
+      # file base64-encoded in the GOOGLE_SERVICES_JSON secret and it will be restored here.
       - name: Restore google-services.json (optional)
         if: ${{ env.GOOGLE_SERVICES_JSON != '' }}
         run: echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
 
+      - name: Version from tag
+        id: version
+        run: |
+          ARGS="-PappVersionCode=${GITHUB_RUN_NUMBER}"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            ARGS="$ARGS -PappVersionName=${GITHUB_REF_NAME#v}"
+          fi
+          echo "args=$ARGS" >> "$GITHUB_OUTPUT"
+
       - name: Build debug APK, lint and unit tests
-        run: ./gradlew assembleDebug lint testDebugUnitTest :domain:test --stacktrace
+        run: ./gradlew assembleDebug lint testDebugUnitTest :domain:test ${{ steps.version.outputs.args }} --stacktrace
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
           path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
           retention-days: 30
 
       - name: Upload reports
@@ -61,3 +75,97 @@ jobs:
             **/build/reports/
             **/build/test-results/
           retention-days: 7
+
+  release:
+    name: Publish APK release
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      ASSET: traffic-fine-manager.apk
+      HAS_FIREBASE: ${{ secrets.GOOGLE_SERVICES_JSON != '' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: app-debug-apk
+          path: build-apk
+
+      - name: Prepare assets and release notes
+        id: prep
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          APK="$(find build-apk -name "*.apk" | head -n1)"
+          cp "$APK" "dist/$ASSET"
+          SHORT_SHA="${GITHUB_SHA::7}"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            cp "$APK" "dist/traffic-fine-manager-${GITHUB_REF_NAME}.apk"
+            echo "title=Traffic Fine Manager ${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            HEADLINE="Release **${GITHUB_REF_NAME}**, built from commit ${GITHUB_SHA}."
+          else
+            echo "title=Latest build (main @ ${SHORT_SHA})" >> "$GITHUB_OUTPUT"
+            HEADLINE="Rolling build of \`main\` at commit ${GITHUB_SHA}, replaced on every push."
+          fi
+          (cd dist && sha256sum ./*.apk > SHA256SUMS.txt)
+          if [ "$HAS_FIREBASE" = "true" ]; then
+            BACKEND="Built with the project's Firebase configuration: officers can sign in, and **Try the demo** is also available."
+          else
+            BACKEND="Built without a Firebase configuration: officer sign-in is disabled. Tap **Try the demo** to explore the app with sample data stored only on the device."
+          fi
+          {
+            echo "$HEADLINE"
+            echo
+            echo "### Download"
+            echo "[\`$ASSET\`](https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/$ASSET) (stable link, always the newest build of \`main\`)"
+            echo
+            echo "### Important"
+            echo "- **This is an unsigned debug build** (signed only with a throwaway CI debug key), for evaluation. It is not a Play Store release."
+            echo "- The debug key changes between CI runs, so Android may refuse to update over an earlier build. Uninstall the previous version first."
+            echo "- Android 7.0 (API 24) or newer. You may need to allow installing apps from your browser or file manager."
+            echo "- $BACKEND"
+            echo
+            echo "Verify the download with \`SHA256SUMS.txt\`. Website: https://srini2k03.github.io/traffic-violation-fine-manager/"
+          } > release-notes.md
+          cat release-notes.md
+
+      # The rolling release lives on a "latest" tag that is force-moved to this commit, so
+      # .../releases/latest/download/traffic-fine-manager.apk always serves the newest main build.
+      - name: Move the rolling "latest" tag
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git tag -f latest "$GITHUB_SHA"
+          git push -f origin refs/tags/latest
+
+      - name: Publish rolling release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: ${{ steps.prep.outputs.title }}
+          body_path: release-notes.md
+          prerelease: false
+          make_latest: 'true'
+          files: |
+            dist/traffic-fine-manager.apk
+            dist/SHA256SUMS.txt
+
+      # Versioned releases keep their own copy; "latest" keeps pointing at the newest main build.
+      - name: Publish versioned release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ steps.prep.outputs.title }}
+          body_path: release-notes.md
+          make_latest: 'false'
+          files: |
+            dist/*.apk
+            dist/SHA256SUMS.txt
