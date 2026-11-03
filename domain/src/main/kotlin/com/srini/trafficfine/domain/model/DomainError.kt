@@ -9,6 +9,8 @@ sealed class DomainError(message: String) : Exception(message) {
     data object NotAuthorized : DomainError("This account has no officer/admin role")
     data object AccountDisabled : DomainError("This officer account has been deactivated")
     data object AdminOnly : DomainError("Only administrators can do this")
+    data object BackendNotConfigured : DomainError("Sign-in is not configured in this build. Use the demo to explore the app.")
+    data object DemoUnavailable : DomainError("Demo mode is not available in this build")
     data object NotSignedIn : DomainError("Session expired, please sign in again")
     data class Validation(val errors: Set<FormError>) : DomainError("Invalid form: $errors")
     data class NotFound(val id: String) : DomainError("Violation $id not found")

@@ -1,13 +1,16 @@
 package com.srini.trafficfine.data.sync
 
+import com.srini.trafficfine.data.demo.DemoSessionStore
 import com.srini.trafficfine.data.local.OfficerLogDao
 import com.srini.trafficfine.data.local.PendingOp
 import com.srini.trafficfine.data.local.ViolationDao
 import com.srini.trafficfine.data.local.toDomain
 import com.srini.trafficfine.data.local.toEntity
 import com.srini.trafficfine.data.remote.EvidenceUploader
+import com.srini.trafficfine.data.remote.FirebaseAvailability
 import com.srini.trafficfine.data.remote.ViolationRemoteDataSource
 import com.srini.trafficfine.data.session.SessionStore
+import com.srini.trafficfine.domain.demo.DemoData
 import com.srini.trafficfine.domain.model.Officer
 import com.srini.trafficfine.domain.repository.AuthRepository
 import com.srini.trafficfine.domain.util.TimeProvider
@@ -40,8 +43,12 @@ class SyncEngine @Inject constructor(
     private val uploader: EvidenceUploader,
     private val session: SessionStore,
     private val time: TimeProvider,
+    private val firebase: FirebaseAvailability,
+    private val demoSession: DemoSessionStore,
 ) {
     suspend fun sync(): SyncReport {
+        // Demo sessions and builds without a Firebase config have nothing to talk to.
+        if (!firebase.isConfigured || demoSession.isActive) return SyncReport(skipped = true)
         val officer = withTimeoutOrNull(AUTH_TIMEOUT_MS) { auth.currentOfficer.first() }
             ?: return SyncReport(skipped = true)
 
@@ -61,7 +68,9 @@ class SyncEngine @Inject constructor(
         var failed = 0
         // Records queued by a previously signed-in officer stay local until that officer signs in again;
         // the security rules would reject them for anyone else (admins may push everything).
-        val mine = violationDao.pending().filter { officer.isAdmin || it.officerId == officer.uid || it.collectedBy == officer.uid }
+        val mine = violationDao.pending()
+            .filterNot { DemoData.isDemoUid(it.officerId) }
+            .filter { officer.isAdmin || it.officerId == officer.uid || it.collectedBy == officer.uid }
         for (entity in mine) {
             val ok = attempt {
                 when (entity.pendingOp) {
@@ -95,7 +104,7 @@ class SyncEngine @Inject constructor(
     private suspend fun pushLogs(officer: Officer): SyncReport {
         var pushed = 0
         var failed = 0
-        for (entity in logDao.pending().filter { it.officerId == officer.uid }) {
+        for (entity in logDao.pending().filter { it.officerId == officer.uid && !DemoData.isDemoUid(it.officerId) }) {
             val ok = attempt {
                 remote.appendLog(entity.toDomain())
                 logDao.markSynced(entity.id)

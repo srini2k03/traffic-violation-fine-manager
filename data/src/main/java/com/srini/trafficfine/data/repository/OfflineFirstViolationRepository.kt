@@ -1,13 +1,17 @@
 package com.srini.trafficfine.data.repository
 
+import com.srini.trafficfine.data.demo.DemoSessionStore
 import com.srini.trafficfine.data.local.OfficerLogDao
 import com.srini.trafficfine.data.local.PendingOp
 import com.srini.trafficfine.data.local.ViolationDao
 import com.srini.trafficfine.data.local.toDomain
 import com.srini.trafficfine.data.local.toEntity
+import com.srini.trafficfine.data.remote.FirebaseAvailability
 import com.srini.trafficfine.data.remote.ViolationRemoteDataSource
+import com.srini.trafficfine.domain.demo.DemoData
 import com.srini.trafficfine.domain.fine.PriorOffenceCounter
 import com.srini.trafficfine.domain.model.DomainError
+import com.srini.trafficfine.domain.model.Officer
 import com.srini.trafficfine.domain.model.Payment
 import com.srini.trafficfine.domain.model.Violation
 import com.srini.trafficfine.domain.model.ViolationFilter
@@ -16,7 +20,6 @@ import com.srini.trafficfine.domain.repository.ViolationRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,12 +27,17 @@ import javax.inject.Singleton
 /**
  * Room is the single source of truth for the UI. Writes land in Room immediately with a
  * [PendingOp] marker and are pushed to Firebase by [com.srini.trafficfine.data.sync.SyncEngine].
+ *
+ * Demo records (see [DemoData]) share the database but are only visible during a demo session,
+ * and real records are never shown to a demo session.
  */
 @Singleton
 class OfflineFirstViolationRepository @Inject constructor(
     private val dao: ViolationDao,
     private val logDao: OfficerLogDao,
     private val remote: ViolationRemoteDataSource,
+    private val demoSession: DemoSessionStore,
+    private val firebase: FirebaseAvailability,
 ) : ViolationRepository {
 
     override fun observeViolations(filter: ViolationFilter): Flow<List<Violation>> =
@@ -39,12 +47,17 @@ class OfflineFirstViolationRepository @Inject constructor(
             fromMillis = filter.fromMillis,
             toMillis = filter.toMillis,
             officerId = filter.officerId,
-        ).map { rows -> rows.map { it.toDomain() } }
+        ).combine(demoSession.officer) { rows, demo ->
+            rows.filter { it.officerId.isVisibleTo(demo) }.map { it.toDomain() }
+        }
 
     override fun observeViolation(id: String): Flow<Violation?> =
-        dao.observeById(id).map { it?.toDomain() }
+        dao.observeById(id).combine(demoSession.officer) { row, demo ->
+            row?.takeIf { it.officerId.isVisibleTo(demo) }?.toDomain()
+        }
 
-    override suspend fun getViolation(id: String): Violation? = dao.getById(id)?.toDomain()
+    override suspend fun getViolation(id: String): Violation? =
+        dao.getById(id)?.takeIf { it.officerId.isVisibleTo(demoSession.officer.value) }?.toDomain()
 
     override suspend fun saveNew(violation: Violation) {
         dao.upsert(violation.toEntity(PendingOp.CREATE))
@@ -81,7 +94,11 @@ class OfflineFirstViolationRepository @Inject constructor(
         combine(dao.observePendingCount(), logDao.observePendingCount()) { violations, logs -> violations + logs }
 
     override suspend fun priorOffenceCounts(vehicleNumber: String, sinceMillis: Long): Map<String, Int> {
-        val local = dao.findByPlateSince(vehicleNumber, sinceMillis).map { it.toDomain() }
+        val demo = demoSession.officer.value
+        val local = dao.findByPlateSince(vehicleNumber, sinceMillis)
+            .filter { it.officerId.isVisibleTo(demo) }
+            .map { it.toDomain() }
+        if (demo != null || !firebase.isConfigured) return PriorOffenceCounter.count(local, sinceMillis)
         val remoteRows = withTimeoutOrNull(REMOTE_LOOKUP_TIMEOUT_MS) {
             try {
                 remote.fetchByPlate(vehicleNumber)
@@ -96,6 +113,8 @@ class OfflineFirstViolationRepository @Inject constructor(
 
     private companion object {
         const val REMOTE_LOOKUP_TIMEOUT_MS = 4_000L
+
+        fun String.isVisibleTo(demoOfficer: Officer?): Boolean = DemoData.isDemoUid(this) == (demoOfficer != null)
 
         /** A record not yet created remotely is pushed in full, so CREATE absorbs later edits. */
         fun PendingOp?.mergeWith(next: PendingOp): PendingOp = if (this == PendingOp.CREATE) PendingOp.CREATE else next

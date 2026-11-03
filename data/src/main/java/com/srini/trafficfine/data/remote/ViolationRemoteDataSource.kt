@@ -5,14 +5,17 @@ import com.google.firebase.database.FirebaseDatabase
 import com.srini.trafficfine.domain.model.OfficerLog
 import com.srini.trafficfine.domain.model.Payment
 import com.srini.trafficfine.domain.model.Violation
+import dagger.Lazy
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** [database] is resolved lazily so builds without a Firebase config can construct this class. */
 @Singleton
 class ViolationRemoteDataSource @Inject constructor(
-    private val database: FirebaseDatabase,
+    private val lazyDatabase: Lazy<FirebaseDatabase>,
 ) {
+    private val database: FirebaseDatabase get() = lazyDatabase.get()
     private val violations get() = database.getReference(FirebasePaths.VIOLATIONS)
 
     /** Creates the record; security rules only allow this when the node does not exist yet. */

@@ -64,6 +64,9 @@ abstract class ViolationDao {
     )
     abstract suspend fun markSynced(id: String, expectedUpdatedAt: Long, photoUrl: String?): Int
 
+    @Query("DELETE FROM violations WHERE officerId LIKE :prefix || '%'")
+    abstract suspend fun deleteByOfficerPrefix(prefix: String): Int
+
     @Query("UPDATE violations SET evidencePhotoUrl = :photoUrl WHERE id = :id")
     abstract suspend fun setPhotoUrl(id: String, photoUrl: String)
 

@@ -1,5 +1,6 @@
 package com.srini.trafficfine.domain.repository
 
+import com.srini.trafficfine.domain.demo.DemoSeed
 import com.srini.trafficfine.domain.model.GeoPoint
 import com.srini.trafficfine.domain.model.Officer
 import com.srini.trafficfine.domain.model.OfficerLog
@@ -78,4 +79,19 @@ data class ChallanDocument(val absolutePath: String, val mimeType: String = "app
 
 interface ChallanDocumentGenerator {
     suspend fun generate(violation: Violation): ChallanDocument
+}
+
+/**
+ * Offline demo: a local session seeded with sample data that never talks to Firebase, so the
+ * app can be explored (and screenshotted) without a backend or an account.
+ */
+interface DemoModeRepository {
+    /** Whether this build offers the demo. */
+    val isDemoAvailable: Boolean
+
+    /** Whether a real backend is configured, i.e. officers can sign in with an account. */
+    val isBackendConfigured: Boolean
+
+    /** Replaces any earlier demo records with [seed] and signs in as [officer] locally. */
+    suspend fun start(officer: Officer, seed: DemoSeed)
 }

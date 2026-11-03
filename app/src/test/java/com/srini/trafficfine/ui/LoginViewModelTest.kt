@@ -1,12 +1,17 @@
 package com.srini.trafficfine.ui
 
 import app.cash.turbine.test
+import com.srini.trafficfine.domain.demo.DemoData
 import com.srini.trafficfine.domain.model.DomainError
+import com.srini.trafficfine.domain.model.Role
 import com.srini.trafficfine.domain.repository.AuthRepository
+import com.srini.trafficfine.domain.repository.DemoModeRepository
 import com.srini.trafficfine.domain.usecase.SignInUseCase
+import com.srini.trafficfine.domain.usecase.StartDemoUseCase
 import com.srini.trafficfine.ui.login.LoginViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
@@ -23,7 +28,12 @@ class LoginViewModelTest {
 
     private val signIn = mockk<SignInUseCase>()
     private val auth = mockk<AuthRepository>()
-    private val viewModel = LoginViewModel(signIn, auth)
+    private val startDemo = mockk<StartDemoUseCase>()
+    private val demoMode = mockk<DemoModeRepository> {
+        every { isBackendConfigured } returns true
+        every { isDemoAvailable } returns true
+    }
+    private val viewModel = LoginViewModel(signIn, auth, startDemo, demoMode)
 
     @Test
     fun `submit is disabled until both fields are filled`() {
@@ -86,5 +96,54 @@ class LoginViewModelTest {
         viewModel.onEmailChange("a@b.in")
         viewModel.sendPasswordReset()
         assertEquals("Password reset link sent to a@b.in", viewModel.state.value.info)
+    }
+
+    @Test
+    fun `try demo shows progress and signs in through the use case`() = runTest {
+        val gate = CompletableDeferred<Result<com.srini.trafficfine.domain.model.Officer>>()
+        coEvery { startDemo(Role.ADMIN) } coAnswers { gate.await() }
+
+        viewModel.state.test {
+            assertNull(awaitItem().startingDemo)
+            viewModel.tryDemo(Role.ADMIN)
+            val busy = awaitItem()
+            assertEquals(Role.ADMIN, busy.startingDemo)
+            assertFalse(busy.canSubmit)
+            viewModel.tryDemo(Role.OFFICER) // ignored while busy
+            gate.complete(Result.success(DemoData.ADMIN))
+            assertNull(awaitItem().startingDemo)
+        }
+        coVerify(exactly = 1) { startDemo(any()) }
+    }
+
+    @Test
+    fun `demo failures are shown`() = runTest {
+        coEvery { startDemo(Role.OFFICER) } returns Result.failure(IllegalStateException("disk full"))
+        viewModel.tryDemo(Role.OFFICER)
+        assertEquals("Could not start the demo", viewModel.state.value.error)
+        assertNull(viewModel.state.value.startingDemo)
+    }
+
+    @Test
+    fun `without a backend only the demo is offered`() = runTest {
+        every { demoMode.isBackendConfigured } returns false
+        val vm = LoginViewModel(signIn, auth, startDemo, demoMode)
+        vm.onEmailChange("a@b.in")
+        vm.onPasswordChange("password123")
+
+        assertFalse(vm.state.value.backendConfigured)
+        assertFalse(vm.state.value.canSubmit)
+        assertTrue(vm.state.value.demoAvailable)
+        vm.sendPasswordReset()
+        assertEquals(DomainError.BackendNotConfigured.message, vm.state.value.error)
+        coVerify(exactly = 0) { auth.sendPasswordReset(any()) }
+    }
+
+    @Test
+    fun `demo is not started when the build disables it`() = runTest {
+        every { demoMode.isDemoAvailable } returns false
+        val vm = LoginViewModel(signIn, auth, startDemo, demoMode)
+        vm.tryDemo(Role.ADMIN)
+        coVerify(exactly = 0) { startDemo(any()) }
     }
 }

@@ -55,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -156,7 +157,7 @@ fun IssueViolationScreen(
                     if (state.plateValid) Icon(Icons.Filled.CheckCircle, "Valid", tint = MaterialTheme.colorScheme.primary)
                 },
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag(PLATE_FIELD_TAG),
             )
 
             SectionTitle("Offences")
@@ -362,3 +363,6 @@ private fun ErrorBanner(message: String) {
         }
     }
 }
+
+/** Test tag on the registration-number field (used by the screenshot tour). */
+const val PLATE_FIELD_TAG = "issue_plate"
