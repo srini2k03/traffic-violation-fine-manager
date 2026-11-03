@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.filled.Payments
@@ -82,6 +83,7 @@ private fun LogAction.label(): String = when (this) {
     LogAction.VIOLATION_ISSUED -> "Challan issued"
     LogAction.FINE_PAID -> "Fine collected"
     LogAction.CHALLAN_SHARED -> "Challan shared"
+    LogAction.CHALLAN_CANCELLED -> "Challan cancelled"
     LogAction.SYNC_COMPLETED -> "Synced"
 }
 
@@ -91,5 +93,6 @@ private fun LogAction.icon(): ImageVector = when (this) {
     LogAction.VIOLATION_ISSUED -> Icons.AutoMirrored.Filled.ReceiptLong
     LogAction.FINE_PAID -> Icons.Filled.Payments
     LogAction.CHALLAN_SHARED -> Icons.Filled.Share
+    LogAction.CHALLAN_CANCELLED -> Icons.Filled.Cancel
     LogAction.SYNC_COMPLETED -> Icons.Filled.CloudDone
 }

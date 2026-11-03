@@ -14,7 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.AddCircle
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -60,7 +62,8 @@ fun DashboardScreen(
     onOpenHistory: () -> Unit,
     onOpenActivityLog: () -> Unit,
     onOpenViolation: (String) -> Unit,
-    onSignOut: () -> Unit,
+    onOpenProfile: () -> Unit,
+    onOpenAdmin: () -> Unit,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -84,7 +87,7 @@ fun DashboardScreen(
                     } else {
                         IconButton(onClick = viewModel::syncNow) { Icon(Icons.Filled.Sync, "Sync now") }
                     }
-                    IconButton(onClick = onSignOut) { Icon(Icons.AutoMirrored.Filled.Logout, "Sign out") }
+                    IconButton(onClick = onOpenProfile) { Icon(Icons.Filled.AccountCircle, "Profile and settings") }
                 },
             )
         },
@@ -101,6 +104,15 @@ fun DashboardScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            if (officer.isAdmin) {
+                item {
+                    Button(onClick = onOpenAdmin, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Filled.AdminPanelSettings, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Admin console · analytics & officers")
+                    }
+                }
+            }
             item { SectionTitle("Today") }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

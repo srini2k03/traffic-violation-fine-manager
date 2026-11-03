@@ -40,7 +40,9 @@ even with no network — and keeps officer activity logs and violation history s
 | **e-Challan PDF** | A4 challan / receipt rendered with `android.graphics.pdf.PdfDocument`, with a **ZXing QR code** pointing to a verification URL (no personal data in the QR), shared via `FileProvider` + share sheet. |
 | **History** | Search by plate or challan number, filter by status (pending / paid / cancelled) and date range (today, 7 days, 30 days, all), running total. |
 | **Mark fine paid** | Cash / UPI / card / online with transaction reference validation; recorded offline and synced as a minimal multi-path update permitted by the rules. |
-| **Activity log** | Append-only officer log (sign-in/out, challan issued, fine collected, challan shared) grouped by day. |
+| **Activity log** | Append-only officer log (sign-in/out, challan issued, fine collected, challan shared, challan cancelled) grouped by day. |
+| **Admin console** | For `role = admin`: analytics over 7 / 30 / 90 days with **hand-drawn Compose Canvas charts** (daily issued-vs-collected bars, status donut, offence-category and top-offence bars, officer leaderboard), KPIs (collection rate, repeat-offender share), and **officer management** (live officer directory, activate/deactivate accounts, per-officer performance). Admins can also cancel pending challans with a recorded reason. |
+| **Profile & settings** | Officer profile (badge, station, role), sync status with pending-change count and "sync now", password-reset email, link to the activity log, app version, and sign-out with a warning when changes are still unsynced. |
 | **Offline-first** | Room is the single source of truth; every write is queued with a pending-operation marker and pushed by a Hilt-injected **WorkManager** worker (network-constrained, exponential backoff, periodic safety net). Firebase RTDB offline persistence is enabled as well. |
 
 ## Architecture
@@ -126,7 +128,7 @@ Realtime Database tree (see [`firebase/sample-data.json`](firebase/sample-data.j
 ```jsonc
 {
   "officers": {
-    "<uid>": { "name": "Insp. Priya Raman", "badgeNumber": "TNP-4821", "station": "Adyar Traffic", "active": true }
+    "<uid>": { "name": "Insp. Priya Raman", "email": "priya@tnpolice.gov.in", "role": "officer", "badgeNumber": "TNP-4821", "station": "Adyar Traffic", "active": true }
   },
   "violations": {
     "<violationId>": {
@@ -148,6 +150,7 @@ Realtime Database tree (see [`firebase/sample-data.json`](firebase/sample-data.j
       "issuedAt": 1694752200000,
       "status": "PENDING | PAID | CANCELLED",
       "payment": { "mode": "CASH | UPI | CARD | ONLINE", "reference": "UPI-778123456", "paidAt": 1694755800000, "collectedBy": "<uid>" },
+      "cancelReason": "Duplicate entry",          // admins only, when status = CANCELLED
       "updatedAt": 1694755800000
     }
   },
@@ -173,9 +176,9 @@ Roles are **Firebase Auth custom claims** (`auth.token.role`), set only from a t
 | Path | Read | Write |
 | --- | --- | --- |
 | `/` | denied | denied (default deny) |
-| `/officers/{uid}` | the officer themself or an admin | admins only |
+| `/officers/{uid}` | the officer themself or an admin | admins only (profile, `role` mirror, `active` flag) |
 | `/violations` | any officer/admin (needed for repeat-offender lookups); indexed on `vehicleNumber`, `officerId`, `updatedAt`, `issuedAt`, `challanNumber` | — |
-| `/violations/{id}` | — | **create only** by an officer for themselves (`!data.exists() && officerId == auth.uid`); admins may edit/cancel |
+| `/violations/{id}` | — | **create only** by an *active* officer for themselves (`!data.exists() && officerId == auth.uid && officers/{uid}/active != false`); admins may edit/cancel (`cancelReason` is admin-only) |
 | `/violations/{id}/status` | — | officer/admin may change `PENDING → PAID` only |
 | `/violations/{id}/payment` | — | officer/admin may add once while status is `PENDING`; `collectedBy` must be the caller |
 | `/violations/{id}/updatedAt` | — | officer/admin, while `PENDING`, monotonic |
@@ -270,7 +273,9 @@ initialised.
 | `IssueViolationUseCaseTest`, `MarkFinePaidUseCaseTest`, `SignInUseCaseTest` | orchestration with MockK: normalisation, repeat-offender pricing, logging, sync requests, failure paths |
 | `ChallanNumberGeneratorTest`, `ChallanQrTest`, `DashboardStatsTest` | challan format, QR payload privacy, dashboard aggregation & history filter |
 | `LoginViewModelTest`, `IssueViolationViewModelTest`, `HistoryViewModelTest`, `ActivityLogViewModelTest` | UI state with Turbine + coroutines-test (debounced fine preview, validation errors, filters) |
-| `MappersTest` (data) | Room entity and Realtime Database map round-trips, malformed node handling, prior-offence de-duplication |
+| `AnalyticsSummaryTest`, `PriorOffenceCounterTest`, `AdminUseCasesTest` | admin analytics windows and aggregation, prior-offence de-duplication, admin-only cancellation and officer activation |
+| `AdminViewModelTest`, `ViolationDetailViewModelTest` | analytics range switching, officer list errors, activation feedback, payment / PDF share / cancellation flows |
+| `MappersTest` (data) | Room entity and Realtime Database map round-trips (incl. cancellation), malformed node handling |
 
 GitHub Actions ([`.github/workflows/android-ci.yml`](.github/workflows/android-ci.yml)) runs on JDK 17:
 rules JSON validation → `./gradlew lint testDebugUnitTest :domain:test` → uploads reports.
@@ -307,7 +312,8 @@ traffic-violation-fine-manager/
 │       ├── main/java/.../
 │       │   ├── TrafficFineApp.kt          # @HiltAndroidApp, WorkManager + HiltWorkerFactory
 │       │   ├── MainActivity.kt
-│       │   ├── ui/{login,dashboard,issue,history,detail,activitylog}/   # Screen + ViewModel
+│       │   ├── ui/{login,dashboard,issue,history,detail,activitylog,profile,admin}/   # Screen + ViewModel
+│       │   ├── ui/admin/Charts.kt         # Canvas bar / donut / horizontal-bar charts
 │       │   ├── ui/{navigation,components,theme}/
 │       │   └── util/                      # formatters, FileProvider sharing
 │       └── test/                          # ViewModel tests
@@ -338,7 +344,8 @@ traffic-violation-fine-manager/
 - [ ] Online payment link (UPI intent / payment gateway) in the challan QR
 - [ ] Vahan / Sarathi integration for owner lookup by registration number
 - [ ] ANPR: plate recognition from the evidence photo with ML Kit text recognition
-- [ ] Admin web console (cancellations, disputes, station analytics)
+- [ ] Officer onboarding from the admin console via a callable Cloud Function (Admin SDK)
+- [ ] Dispute workflow for offenders
 - [ ] Localised strings (Tamil, Hindi) and state-specific fine schedules
 - [ ] App Check + Play Integrity to protect the backend from non-genuine clients
 

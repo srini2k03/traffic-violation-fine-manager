@@ -15,11 +15,13 @@ import com.srini.trafficfine.domain.model.Officer
 import com.srini.trafficfine.ui.MainViewModel
 import com.srini.trafficfine.ui.SessionState
 import com.srini.trafficfine.ui.activitylog.ActivityLogScreen
+import com.srini.trafficfine.ui.admin.AdminScreen
 import com.srini.trafficfine.ui.dashboard.DashboardScreen
 import com.srini.trafficfine.ui.detail.ViolationDetailScreen
 import com.srini.trafficfine.ui.history.HistoryScreen
 import com.srini.trafficfine.ui.issue.IssueViolationScreen
 import com.srini.trafficfine.ui.login.LoginScreen
+import com.srini.trafficfine.ui.profile.ProfileScreen
 
 /** Auth gate: unauthenticated users only ever see the login screen. */
 @Composable
@@ -45,7 +47,8 @@ private fun AppNavHost(officer: Officer, onSignOut: () -> Unit) {
                 onOpenHistory = { navController.navigate(Route.History) },
                 onOpenActivityLog = { navController.navigate(Route.ActivityLog) },
                 onOpenViolation = { navController.navigate(Route.ViolationDetail(it)) },
-                onSignOut = onSignOut,
+                onOpenProfile = { navController.navigate(Route.Profile) },
+                onOpenAdmin = { navController.navigate(Route.Admin) },
             )
         }
         composable<Route.IssueViolation> {
@@ -69,6 +72,21 @@ private fun AppNavHost(officer: Officer, onSignOut: () -> Unit) {
         }
         composable<Route.ActivityLog> {
             ActivityLogScreen(onBack = { navController.popBackStack() })
+        }
+        composable<Route.Profile> {
+            ProfileScreen(
+                officer = officer,
+                onBack = { navController.popBackStack() },
+                onOpenActivityLog = { navController.navigate(Route.ActivityLog) },
+                onSignOut = onSignOut,
+            )
+        }
+        composable<Route.Admin> {
+            AdminScreen(
+                admin = officer,
+                onBack = { navController.popBackStack() },
+                onOpenHistory = { navController.navigate(Route.History) },
+            )
         }
     }
 }
