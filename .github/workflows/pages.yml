@@ -67,7 +67,7 @@ jobs:
   deploy:
     name: Deploy to gh-pages
     needs: screenshots
-    # Still publish the site (with placeholder previews) if the emulator job fails.
+    # Still publish the site if the emulator job fails, keeping the last published screenshots.
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -85,7 +85,25 @@ jobs:
           name: screenshots
           path: web/screenshots
 
+      # The emulator sometimes fails to boot on hosted runners. Instead of replacing real
+      # screenshots with placeholder previews, keep the ones the live site already has, with
+      # their manifest (which records the commit and date they were captured from).
+      - name: Keep the last published screenshots (emulator job did not succeed)
+        if: needs.screenshots.result != 'success'
+        run: |
+          has_screens() {
+            python3 -c 'import json, sys; sys.exit(0 if json.load(sys.stdin).get("screens") else 1)'
+          }
+          if git fetch --quiet --depth=1 origin gh-pages \
+            && git show FETCH_HEAD:screenshots/manifest.json 2>/dev/null | has_screens; then
+            git archive FETCH_HEAD screenshots | tar -x -C web
+            echo "::notice::Emulator job did not succeed; kept $(ls web/screenshots/*.png | wc -l) screenshot(s) from the live site."
+          else
+            echo "::warning::Emulator job did not succeed and the live site has no screenshots to keep; publishing placeholder previews."
+          fi
+
       - name: Write screenshot manifest
+        if: needs.screenshots.result == 'success'
         run: python3 scripts/make-screenshot-manifest.py web/screenshots "$GITHUB_SHA"
 
       - name: Publish to gh-pages

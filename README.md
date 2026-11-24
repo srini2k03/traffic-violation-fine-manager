@@ -311,7 +311,7 @@ is disabled and the login screen offers the demo.
 | Workflow | Trigger | What it does |
 | --- | --- | --- |
 | [`android-ci.yml`](.github/workflows/android-ci.yml) | push / PR to `main`, tags `v*` | rules JSON validation → `./gradlew assembleDebug lint testDebugUnitTest :domain:test` → uploads APK and reports. On pushes it then publishes the APK (see below). |
-| [`pages.yml`](.github/workflows/pages.yml) | push to `main`, manual | builds the app and `ScreenshotTour`, boots an API 34 x86_64 emulator (KVM) with `reactivecircus/android-emulator-runner`, runs [`scripts/capture-screenshots.sh`](scripts/capture-screenshots.sh) in light and dark themes, uploads the PNGs as an artifact, then deploys [`web/`](web/) plus the screenshots to the `gh-pages` branch with `peaceiris/actions-gh-pages`. If the emulator job fails, the site is still deployed with placeholder previews. |
+| [`pages.yml`](.github/workflows/pages.yml) | push to `main`, manual | builds the app and `ScreenshotTour`, boots an API 34 x86_64 emulator (KVM) with `reactivecircus/android-emulator-runner`, runs [`scripts/capture-screenshots.sh`](scripts/capture-screenshots.sh) in light and dark themes, uploads the PNGs as an artifact, then deploys [`web/`](web/) plus the screenshots to the `gh-pages` branch with `peaceiris/actions-gh-pages`. If the emulator job fails, the site is still deployed and keeps the screenshots already on the live site (their manifest still names the commit they were captured from); placeholder previews appear only if no screenshots have been published yet. |
 
 **Releases.** Every push to `main` force-moves the `latest` tag and updates the rolling
 [`latest` release](https://github.com/srini2k03/traffic-violation-fine-manager/releases/tag/latest), so
