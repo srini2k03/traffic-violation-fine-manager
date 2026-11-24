@@ -48,6 +48,9 @@ for VARIANT in light dark; do
   RESULT="$(adb shell am instrument -w -r -e class "$TEST_CLASS" -e variant "$VARIANT" "$RUNNER" | tr -d '\r')"
   echo "$RESULT" | tail -n 20
   if ! echo "$RESULT" | grep -q "^OK ("; then
+    # Show the whole failure (exception type and message), not just the end of the stack trace.
+    DETAILS="$(echo "$RESULT" | sed -n '/^There w[a-z]* [0-9]* failure/,$p')"
+    { [ -n "$DETAILS" ] && echo "$DETAILS" || echo "$RESULT"; } | tail -n 150 >&2 || true
     echo "Screenshot tour failed ($VARIANT)" >&2
     exit 1
   fi

@@ -3,6 +3,7 @@ package com.srini.trafficfine.screenshots
 import android.Manifest
 import android.graphics.Bitmap
 import android.os.SystemClock
+import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasTestTag
@@ -63,7 +64,7 @@ class ScreenshotTour {
         composeRule.onNodeWithTag(ISSUE_FAB_TAG).performClick()
         composeRule.waitUntilAtLeastOneExists(hasTestTag(PLATE_FIELD_TAG), TIMEOUT)
         composeRule.onNodeWithTag(PLATE_FIELD_TAG).performTextInput("TN09AB1234")
-        Espresso.closeSoftKeyboard()
+        hideKeyboard()
         clickText("Riding without helmet")
         clickText("Driving without seat belt")
         composeRule.waitUntilAtLeastOneExists(hasText("Adyar", substring = true), TIMEOUT)
@@ -101,6 +102,20 @@ class ScreenshotTour {
         } else {
             composeRule.onAllNodesWithText(text, substring = substring, useUnmergedTree = true).onFirst().performClick()
         }
+    }
+
+    /**
+     * Hides the soft keyboard through the activity's own window. Espresso.closeSoftKeyboard() first
+     * waits for the root view to have window focus, which CI emulators do not always grant (the tour
+     * failed there on the Ubuntu 26.04 runner image), and a failure would end the whole tour.
+     */
+    private fun hideKeyboard() {
+        composeRule.runOnUiThread {
+            val activity = composeRule.activity
+            val view = activity.currentFocus ?: activity.window.decorView
+            activity.getSystemService(InputMethodManager::class.java)?.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+        composeRule.waitForIdle()
     }
 
     private fun capture(name: String) {

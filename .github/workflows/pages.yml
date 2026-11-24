@@ -18,7 +18,8 @@ permissions:
 jobs:
   screenshots:
     name: Emulator screenshots
-    runs-on: ubuntu-latest
+    # Pinned: the tour last passed on 24.04; on the 26.04 image the emulator window did not get focus.
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
 
     steps:
@@ -53,6 +54,7 @@ jobs:
           target: google_apis
           profile: pixel_6
           disable-animations: true
+          emulator-boot-timeout: 900
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: ./scripts/capture-screenshots.sh build/screenshots
 
