@@ -1,43 +1,11 @@
-// e-Challan landing page: theme toggle and the screenshot gallery.
+// e-Challan landing page: the screenshot gallery. The theme toggle, card spotlight and scroll
+// reveal come from sb-kit.js (the portfolio's design kit), which fires "sb:theme" on every change.
 (function () {
   'use strict';
 
   var root = document.documentElement;
-  var darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function pageTheme() { return root.dataset.theme === 'light' ? 'light' : 'dark'; }
 
-  function storedTheme() {
-    try { return localStorage.getItem('theme'); } catch (e) { return null; }
-  }
-
-  function currentTheme() {
-    var explicit = root.getAttribute('data-theme');
-    if (explicit === 'light' || explicit === 'dark') return explicit;
-    return darkQuery && darkQuery.matches ? 'dark' : 'light';
-  }
-
-  // ---- Theme toggle -------------------------------------------------------------------
-  var toggle = document.getElementById('theme-toggle');
-  function syncToggleLabel() {
-    if (!toggle) return;
-    toggle.setAttribute('aria-label', currentTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
-  }
-  if (toggle) {
-    toggle.addEventListener('click', function () {
-      var next = currentTheme() === 'dark' ? 'light' : 'dark';
-      root.setAttribute('data-theme', next);
-      try { localStorage.setItem('theme', next); } catch (e) { /* not persisted */ }
-      syncToggleLabel();
-      renderShots();
-    });
-  }
-  if (darkQuery && darkQuery.addEventListener) {
-    darkQuery.addEventListener('change', function () {
-      if (!storedTheme()) { syncToggleLabel(); renderShots(); }
-    });
-  }
-  syncToggleLabel();
-
-  // ---- Screenshot gallery ------------------------------------------------------------
   var SCREENS = [
     { id: 'login', title: 'Login', hint: 'Sign in or try the demo',
       text: 'Firebase email sign-in gated by the officer/admin role claim. Builds without a Firebase project offer a one-tap demo that seeds sample data locally.' },
@@ -55,24 +23,29 @@
 
   var manifest = { screens: {} };
   var selected = 0;
+  var variant = pageTheme(); // which capture (light or dark) the gallery phone shows
+  var galleryEl = document.getElementById('gallery');
   var tabsEl = document.getElementById('gallery-tabs');
   var imgEl = document.getElementById('gallery-shot');
   var heroEl = document.getElementById('hero-shot');
+  var heroVisualEl = heroEl ? heroEl.closest('.hero-visual') : null;
   var captionEl = document.getElementById('gallery-caption');
   var statusEl = document.getElementById('shots-status');
+  var variantBtns = document.querySelectorAll('[data-variant]');
 
-  function shotUrl(id) {
-    var entry = manifest.screens && manifest.screens[id];
+  function entryFor(id) { return manifest.screens && manifest.screens[id]; }
+
+  function shotUrl(id, theme) {
+    var entry = entryFor(id);
     if (entry) {
-      var file = entry[currentTheme()] || entry.light || entry.dark;
+      var file = entry[theme] || entry.light || entry.dark;
       if (file) return 'screenshots/' + file;
     }
     return 'assets/placeholders/' + id + '.svg';
   }
 
-  function setImage(img, id, alt) {
+  function setImage(img, url, alt) {
     if (!img) return;
-    var url = shotUrl(id);
     if (img.getAttribute('src') !== url) {
       img.classList.remove('shot-swap');
       void img.offsetWidth; // restart the fade animation
@@ -84,8 +57,11 @@
 
   function renderShots() {
     var screen = SCREENS[selected];
-    setImage(imgEl, screen.id, screen.title + ' screen of the e-Challan app');
-    setImage(heroEl, 'dashboard', "Dashboard screen of the e-Challan app showing today's challans, fines and recent records");
+    var real = !!entryFor(screen.id);
+    setImage(imgEl, shotUrl(screen.id, variant), screen.title + ' screen of the e-Challan app' + (real ? ' (' + variant + ' theme)' : ', illustrative preview'));
+    setImage(heroEl, shotUrl('dashboard', pageTheme()), "Dashboard screen of the e-Challan app showing today's challans, fines and recent records");
+    if (galleryEl) galleryEl.setAttribute('data-source', real ? 'ci' : 'placeholder');
+    if (heroVisualEl) heroVisualEl.setAttribute('data-source', entryFor('dashboard') ? 'ci' : 'placeholder');
     if (captionEl) {
       captionEl.innerHTML = '';
       var h = document.createElement('h3');
@@ -101,12 +77,21 @@
         tab.tabIndex = i === selected ? 0 : -1;
       });
     }
+    Array.prototype.forEach.call(variantBtns, function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-variant') === variant ? 'true' : 'false');
+    });
   }
 
   function select(index, focus) {
     selected = (index + SCREENS.length) % SCREENS.length;
     renderShots();
     if (focus && tabsEl) tabsEl.children[selected].focus();
+  }
+
+  function preload(id) {
+    if (!entryFor(id)) return;
+    var img = new Image();
+    img.src = shotUrl(id, variant);
   }
 
   if (tabsEl) {
@@ -117,19 +102,42 @@
       tab.setAttribute('role', 'tab');
       tab.id = 'tab-' + screen.id;
       tab.setAttribute('aria-controls', 'gallery-shot');
-      tab.innerHTML = '';
-      tab.appendChild(document.createTextNode(screen.title));
+      var num = document.createElement('span');
+      num.className = 'gallery-tab__num';
+      num.textContent = (i < 9 ? '0' : '') + (i + 1);
+      num.setAttribute('aria-hidden', 'true');
+      tab.appendChild(num);
+      var label = document.createElement('span');
+      label.className = 'gallery-tab__text';
+      label.appendChild(document.createTextNode(screen.title));
       var small = document.createElement('small');
       small.textContent = screen.hint;
-      tab.appendChild(small);
+      label.appendChild(small);
+      tab.appendChild(label);
       tab.addEventListener('click', function () { select(i, false); });
+      tab.addEventListener('pointerenter', function () { preload(screen.id); });
+      tab.addEventListener('focus', function () { preload(screen.id); });
       tab.addEventListener('keydown', function (e) {
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); select(selected + 1, true); }
         if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); select(selected - 1, true); }
+        if (e.key === 'Home') { e.preventDefault(); select(0, true); }
+        if (e.key === 'End') { e.preventDefault(); select(SCREENS.length - 1, true); }
       });
       tabsEl.appendChild(tab);
     });
   }
+
+  // Light / dark capture switch for the gallery phone; a page theme change also switches it.
+  Array.prototype.forEach.call(variantBtns, function (b) {
+    b.addEventListener('click', function () {
+      variant = b.getAttribute('data-variant') === 'light' ? 'light' : 'dark';
+      renderShots();
+    });
+  });
+  document.addEventListener('sb:theme', function (e) {
+    variant = e.detail === 'light' ? 'light' : 'dark';
+    renderShots();
+  });
 
   // Fall back to the placeholder if a published screenshot ever fails to load.
   [imgEl, heroEl].forEach(function (img) {
@@ -156,7 +164,7 @@
           var parts = ['Captured on an Android 14 emulator by GitHub Actions'];
           if (when && !isNaN(when)) parts.push('on ' + when.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }));
           if (data.commit) parts.push('from commit ' + String(data.commit).slice(0, 7));
-          statusEl.textContent = parts.join(' ') + '. They follow this page’s light or dark theme.';
+          statusEl.textContent = parts.join(' ') + '. Each screen has a light and a dark capture; they follow this page’s theme, or pick one below.';
         }
       })
       .catch(function () { /* keep the previews */ });

@@ -1,215 +1,238 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" class="no-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>e-Challan · Traffic Fine Manager</title>
   <meta name="description" content="A native Android app for traffic police to issue digital violation notices (e-challans) in real time, even offline. Kotlin, Jetpack Compose, Room and Firebase.">
-  <meta name="theme-color" content="#0b3d91" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#07090c">
   <meta property="og:title" content="e-Challan · Traffic Fine Manager">
   <meta property="og:description" content="Issue digital e-challans in seconds, even offline. Open-source Android app built with Kotlin, Compose and Firebase.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://srini2k03.github.io/traffic-violation-fine-manager/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <!-- Theme before first paint: same localStorage key as https://srini2k03.github.io/, dark by default. -->
+  <script>(function(){try{var t=localStorage.getItem('theme');document.documentElement.dataset.theme=(t==='light'||t==='dark')?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}document.documentElement.classList.remove('no-js');})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="sb-kit.css">
   <link rel="stylesheet" href="styles.css">
-  <script>
-    // Apply the saved theme before first paint to avoid a flash.
-    try {
-      var saved = localStorage.getItem('theme');
-      if (saved === 'light' || saved === 'dark') document.documentElement.setAttribute('data-theme', saved);
-    } catch (e) { /* storage unavailable: follow the system theme */ }
-  </script>
+  <script src="sb-kit.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
-<body>
+<body class="sb-grain">
+  <div class="sb-backdrop" aria-hidden="true"></div>
   <a class="skip" href="#main">Skip to content</a>
 
-  <header class="site-header">
-    <div class="container nav">
-      <a class="brand" href="#top" aria-label="e-Challan home">
-        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-          <rect width="32" height="32" rx="8" fill="#0b3d91"/>
-          <rect x="11" y="5" width="10" height="22" rx="3" fill="#fff"/>
-          <circle cx="16" cy="10" r="2.6" fill="#e53935"/>
-          <circle cx="16" cy="16" r="2.6" fill="#ffb300"/>
-          <circle cx="16" cy="22" r="2.6" fill="#43a047"/>
-        </svg>
-        <span>e-Challan</span>
+  <header class="sb-nav">
+    <div class="sb-container sb-nav__inner">
+      <a class="sb-brand" href="https://srini2k03.github.io/" title="Back to the portfolio">
+        <span class="sb-brand__mark" aria-hidden="true">SB</span>
+        <span class="brand-text">
+          <span class="brand-name">Srinivasan B.</span>
+          <span class="sb-brand__sub"><span class="brand-slash" aria-hidden="true">/ </span>e-Challan (Android)</span>
+        </span>
       </a>
-      <nav class="nav-links" aria-label="Sections">
-        <a href="#features">Features</a>
-        <a href="#screens">Screens</a>
-        <a href="#architecture">Architecture</a>
-        <a href="#data">Data &amp; rules</a>
-        <a href="#stack">Stack</a>
-      </nav>
-      <div class="nav-actions">
-        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
-          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></svg>
-          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
+      <nav class="sb-nav__links" aria-label="Sections">
+        <a class="sb-nav__link nav-section-link" href="#features">Features</a>
+        <a class="sb-nav__link nav-section-link" href="#screens">Screens</a>
+        <a class="sb-nav__link nav-section-link" href="#architecture">Architecture</a>
+        <a class="sb-nav__link nav-section-link" href="#data">Data &amp; rules</a>
+        <a class="sb-nav__link nav-section-link" href="#stack">Stack</a>
+        <a class="sb-nav__link nav-code" href="https://github.com/srini2k03/traffic-violation-fine-manager">Code
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        <button class="sb-icon-btn theme-toggle" id="theme-toggle" type="button" data-theme-toggle aria-label="Switch to light theme">
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
         </button>
-        <a class="icon-btn" href="https://github.com/srini2k03/traffic-violation-fine-manager" aria-label="Source code on GitHub">
-          <svg viewBox="0 0 24 24" aria-hidden="true" class="filled"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
-        </a>
-      </div>
+      </nav>
     </div>
   </header>
 
   <main id="main">
-    <section class="hero" id="top">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <p class="eyebrow">Android · Kotlin · Jetpack Compose · Firebase</p>
-          <h1>Digital e-challans, issued in seconds. <span class="accent">Even offline.</span></h1>
-          <p class="lead">
-            A native app for traffic police officers: validate the plate, pick the offences, attach GPS and photo
-            evidence, and hand over a QR-coded PDF challan. Repeat offenders are priced automatically, and every
-            record syncs to Firebase when the network returns.
-          </p>
-          <div class="cta-row">
-            <a class="btn btn-primary" id="download-apk"
-               href="https://github.com/srini2k03/traffic-violation-fine-manager/releases/latest/download/traffic-fine-manager.apk">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>
-              Download APK
-            </a>
-            <a class="btn btn-ghost" href="https://github.com/srini2k03/traffic-violation-fine-manager">View source</a>
+    <!-- ============================================================ hero -->
+    <section class="sb-hero hero" id="top" aria-labelledby="hero-title">
+      <div class="sb-container">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="sb-kicker"><span class="sb-kicker__index">Android</span><span class="sb-kicker__rule" aria-hidden="true"></span>Kotlin · Firebase · 2023</p>
+            <h1 class="sb-h1 hero-title" id="hero-title">Digital e-challans, issued in seconds. Even <span class="sb-serif">offline.</span></h1>
+            <p class="sb-lead">
+              A native app for traffic police officers: validate the plate, pick the offences, attach GPS and photo
+              evidence, and hand over a QR-coded PDF challan. Repeat offenders are priced automatically, and every
+              record syncs to Firebase when the network returns.
+            </p>
+            <div class="sb-hero__meta">
+              <span class="sb-pill">CI-built debug APK</span>
+              <span class="sb-pill">Demo mode, no account needed</span>
+              <span class="sb-pill sb-pill--plain">Android 7.0+ (API 24)</span>
+            </div>
+            <div class="sb-hero__actions">
+              <a class="sb-btn sb-btn--primary" id="download-apk"
+                 href="https://github.com/srini2k03/traffic-violation-fine-manager/releases/latest/download/traffic-fine-manager.apk">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>
+                Download APK
+              </a>
+              <a class="sb-btn" href="https://github.com/srini2k03/traffic-violation-fine-manager">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5Z"/></svg>
+                View source
+              </a>
+            </div>
+            <p class="fine-print">
+              Latest build from <code>main</code> · Android 7.0+ · debug-signed, for evaluation only.
+              No account needed: tap <strong>Try the demo</strong> on the login screen.
+              <a href="https://github.com/srini2k03/traffic-violation-fine-manager/releases">All releases</a>
+            </p>
           </div>
-          <p class="fine-print">
-            Latest build from <code>main</code> · Android 7.0+ · debug-signed, for evaluation only.
-            No account needed: tap <strong>Try the demo</strong> on the login screen.
-            <a href="https://github.com/srini2k03/traffic-violation-fine-manager/releases">All releases</a>
-          </p>
-        </div>
-        <div class="hero-visual">
-          <div class="phone phone-hero">
-            <div class="phone-screen">
-              <img id="hero-shot" src="assets/placeholders/dashboard.svg" width="360" height="800"
-                   alt="Dashboard screen of the e-Challan app showing today's challans, fines and recent records">
+
+          <div class="hero-visual" data-source="placeholder">
+            <div class="phone phone-hero">
+              <div class="phone-screen">
+                <img id="hero-shot" src="assets/placeholders/dashboard.svg" width="360" height="800"
+                     alt="Dashboard screen of the e-Challan app showing today's challans, fines and recent records">
+              </div>
+            </div>
+            <div class="floating-card fc-1" aria-hidden="true">
+              <span class="dot dot-live"></span> Synced to Firebase
+            </div>
+            <div class="floating-card fc-2" aria-hidden="true">
+              Repeat offence <strong>×1.5</strong>
             </div>
           </div>
-          <div class="floating-card fc-1" aria-hidden="true">
-            <span class="dot dot-green"></span> Synced to Firebase
-          </div>
-          <div class="floating-card fc-2" aria-hidden="true">
-            Repeat offence <strong>×1.5</strong>
-          </div>
         </div>
+
+        <!-- Counts from the repository: @Test functions in domain, data and app; settings.gradle.kts; ViolationCatalogue.kt. -->
+        <dl class="sb-stats hero-stats" aria-label="Key facts">
+          <div class="sb-stat"><dt class="sb-stat__label">Tests</dt><dd class="sb-stat__value">107</dd><dd class="sb-stat__ctx">106 JVM unit + 1 instrumented · JUnit 4, MockK, Turbine</dd></div>
+          <div class="sb-stat"><dt class="sb-stat__label">Gradle modules</dt><dd class="sb-stat__value">3</dd><dd class="sb-stat__ctx">:domain · :data · :app, Clean Architecture</dd></div>
+          <div class="sb-stat"><dt class="sb-stat__label">Offences</dt><dd class="sb-stat__value">13</dd><dd class="sb-stat__ctx">MV Act sections with 2019 fines</dd></div>
+          <div class="sb-stat"><dt class="sb-stat__label">Network calls to issue</dt><dd class="sb-stat__value">0</dd><dd class="sb-stat__ctx">Room first, synced later by WorkManager</dd></div>
+        </dl>
       </div>
     </section>
 
-    <section class="facts" aria-label="Key facts">
-      <div class="container facts-grid">
-        <div><strong>13</strong><span>offences from the MV Act, 2019</span></div>
-        <div><strong>3</strong><span>Clean Architecture modules</span></div>
-        <div><strong>0</strong><span>network calls needed to issue a challan</span></div>
-        <div><strong>24+</strong><span>minimum Android API level</span></div>
-      </div>
-    </section>
-
-    <section id="features" class="section">
-      <div class="container">
-        <header class="section-head">
-          <p class="eyebrow">Features</p>
-          <h2>Everything an officer needs on the road</h2>
-          <p>Built for patchy networks, busy junctions and auditors who want every rupee accounted for.</p>
-        </header>
-        <div class="feature-grid">
-          <article class="feature">
+    <!-- ============================================================ features -->
+    <section id="features" class="section-block" aria-labelledby="features-title">
+      <div class="sb-container"><div class="section-inner">
+        <div class="section-head sb-reveal">
+          <p class="sb-kicker"><span class="sb-kicker__index">01</span><span class="sb-kicker__rule" aria-hidden="true"></span>Features</p>
+          <h2 class="sb-h2" id="features-title">Everything an officer needs <span class="sb-serif">on the road.</span></h2>
+          <p class="sb-lead">Built for patchy networks, busy junctions and auditors who want every rupee accounted for.</p>
+        </div>
+        <div class="feature-grid sb-reveal">
+          <article class="sb-card sb-spotlight feature">
             <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 12h2M11 12h6"/></svg></div>
-            <h3>Plate validation</h3>
+            <h3 class="sb-h3">Plate validation</h3>
             <p>Indian state series (including Delhi-style <code>DL 3C AF 0001</code>) and Bharat series <code>22 BH 1234 AB</code>, normalised as you type.</p>
           </article>
-          <article class="feature">
+          <article class="sb-card sb-spotlight feature">
             <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/></svg></div>
-            <h3>Repeat-offender pricing</h3>
+            <h3 class="sb-h3">Repeat-offender pricing</h3>
             <p>Integer-rupee calculator escalates ×1.0 → ×1.5 → ×2.0 for prior offences in 365 days, with a per-line cap and a live preview.</p>
           </article>
-          <article class="feature">
+          <article class="sb-card sb-spotlight feature">
             <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg></div>
-            <h3>GPS &amp; photo evidence</h3>
+            <h3 class="sb-h3">GPS &amp; photo evidence</h3>
             <p>Fused location with reverse geocoding and a camera capture via the Activity Result API, down-sampled before upload.</p>
           </article>
-          <article class="feature">
+          <article class="sb-card sb-spotlight feature">
             <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg></div>
-            <h3>QR-coded PDF challan</h3>
+            <h3 class="sb-h3">QR-coded PDF challan</h3>
             <p>A4 challan and receipt rendered with <code>PdfDocument</code>, a ZXing QR that carries no personal data, shared through <code>FileProvider</code>.</p>
           </article>
-          <article class="feature">
+          <article class="sb-card sb-spotlight feature">
             <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2M21 12a9 9 0 0 1-15.5 6.2"/><path d="M18 2v4h-4M6 22v-4h4"/></svg></div>
-            <h3>Offline-first sync</h3>
+            <h3 class="sb-h3">Offline-first sync</h3>
             <p>Room is the source of truth. Writes are queued and pushed by a Hilt WorkManager worker with backoff and optimistic concurrency.</p>
           </article>
-          <article class="feature">
+          <article class="sb-card sb-spotlight feature">
             <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
-            <h3>Role-based security</h3>
+            <h3 class="sb-h3">Role-based security</h3>
             <p>Officer and admin roles are Firebase custom claims set only with the Admin SDK. The rules validate every field and enforce create-only records.</p>
           </article>
-          <article class="feature">
+          <article class="sb-card sb-spotlight feature">
             <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
-            <h3>Admin analytics</h3>
+            <h3 class="sb-h3">Admin analytics</h3>
             <p>7, 30 and 90-day analytics drawn on a Compose Canvas, plus an officer directory with activation controls and challan cancellation.</p>
           </article>
-          <article class="feature">
+          <article class="sb-card sb-spotlight feature">
             <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg></div>
-            <h3>History &amp; audit log</h3>
+            <h3 class="sb-h3">History &amp; audit log</h3>
             <p>Search by plate or challan number, filter by status and date range, and keep an append-only officer activity log.</p>
           </article>
         </div>
-      </div>
+      </div></div>
     </section>
 
-    <section class="section demo-callout" aria-labelledby="demo-title">
-      <div class="container demo-grid">
-        <div>
-          <p class="eyebrow">Demo mode</p>
-          <h2 id="demo-title">Explore it without a Firebase project</h2>
-          <p>
-            The APK works out of the box. <strong>Try the demo</strong> signs you in locally as a station admin
-            (or as a field officer) and seeds a month of realistic challans into Room: repeat offenders,
-            paid, pending and cancelled records, and a full activity log. Demo data never leaves the device
-            and is deleted when you sign out.
-          </p>
+    <!-- ============================================================ demo mode -->
+    <section class="section-block" id="demo" aria-labelledby="demo-title">
+      <div class="sb-container"><div class="section-inner">
+        <div class="demo-grid sb-reveal">
+          <div class="section-head">
+            <p class="sb-kicker"><span class="sb-kicker__index">02</span><span class="sb-kicker__rule" aria-hidden="true"></span>Demo mode</p>
+            <h2 class="sb-h2" id="demo-title">Explore it <span class="sb-serif">without</span> a Firebase project.</h2>
+            <p class="sb-lead">
+              The APK works out of the box. <strong>Try the demo</strong> signs you in locally as a station admin
+              (or as a field officer) and seeds a month of realistic challans into Room: repeat offenders,
+              paid, pending and cancelled records, and a full activity log. Demo data never leaves the device
+              and is deleted when you sign out.
+            </p>
+          </div>
+          <ol class="steps sb-card">
+            <li><span class="step-num">01</span><div><strong>Install</strong> the APK. You may need to allow installs from your browser.</div></li>
+            <li><span class="step-num">02</span><div><strong>Tap “Try the demo”</strong> on the login screen.</div></li>
+            <li><span class="step-num">03</span><div><strong>Issue a challan</strong>, share its PDF, mark it paid, then open the admin console.</div></li>
+          </ol>
         </div>
-        <ol class="steps">
-          <li><span>1</span><div><strong>Install</strong> the APK. You may need to allow installs from your browser.</div></li>
-          <li><span>2</span><div><strong>Tap “Try the demo”</strong> on the login screen.</div></li>
-          <li><span>3</span><div><strong>Issue a challan</strong>, share its PDF, mark it paid, then open the admin console.</div></li>
-        </ol>
-      </div>
+      </div></div>
     </section>
 
-    <section id="screens" class="section">
-      <div class="container">
-        <header class="section-head">
-          <p class="eyebrow">Screens</p>
-          <h2>Real screens, captured on an emulator in CI</h2>
-          <p id="shots-status">Previews are shown until the next CI run publishes real screenshots.</p>
-        </header>
-        <div class="gallery">
+    <!-- ============================================================ screens -->
+    <section id="screens" class="section-block" aria-labelledby="screens-title">
+      <div class="sb-container"><div class="section-inner">
+        <div class="section-head sb-reveal">
+          <p class="sb-kicker"><span class="sb-kicker__index">03</span><span class="sb-kicker__rule" aria-hidden="true"></span>Screens</p>
+          <h2 class="sb-h2" id="screens-title">Real screens, captured on an <span class="sb-serif">emulator</span> in CI.</h2>
+          <p class="sb-lead" id="shots-status">Previews are shown until the next CI run publishes real screenshots.</p>
+        </div>
+        <div class="gallery sb-reveal" id="gallery" data-source="placeholder">
           <div class="gallery-stage">
-            <div class="phone">
+            <div class="phone phone-gallery">
               <div class="phone-screen">
-                <img id="gallery-shot" src="assets/placeholders/login.svg" width="360" height="800" alt="">
+                <img id="gallery-shot" src="assets/placeholders/login.svg" width="360" height="800" alt="Login screen of the e-Challan app">
               </div>
             </div>
+            <p class="preview-badge sb-pill sb-pill--pending" aria-hidden="true">Illustrative preview</p>
           </div>
           <div class="gallery-side">
             <div class="gallery-tabs" role="tablist" aria-label="App screens" id="gallery-tabs"></div>
-            <div class="gallery-caption" id="gallery-caption" aria-live="polite"></div>
+            <div class="sb-card gallery-caption" id="gallery-caption" aria-live="polite">
+              <h3>Login</h3>
+              <p>Firebase email sign-in gated by the officer/admin role claim. Builds without a Firebase project offer a one-tap demo that seeds sample data locally.</p>
+            </div>
+            <div class="gallery-variant">
+              <span class="sb-label" id="variant-label">Screenshot theme</span>
+              <div class="sb-tabs" role="group" aria-labelledby="variant-label">
+                <button type="button" class="sb-tab" data-variant="light" aria-pressed="false">Light</button>
+                <button type="button" class="sb-tab" data-variant="dark" aria-pressed="true">Dark</button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </div></div>
     </section>
 
-    <section id="architecture" class="section section-alt">
-      <div class="container">
-        <header class="section-head">
-          <p class="eyebrow">Architecture</p>
-          <h2>Clean Architecture in three Gradle modules</h2>
-          <p>The domain is pure Kotlin with no Android dependency, so the business rules run as fast JVM tests.</p>
-        </header>
-        <figure class="diagram-wrap">
-          <div class="diagram-scroll" tabindex="0" aria-label="Architecture diagram, scrollable">
+    <!-- ============================================================ architecture -->
+    <section id="architecture" class="section-block" aria-labelledby="architecture-title">
+      <div class="sb-container"><div class="section-inner">
+        <div class="section-head sb-reveal">
+          <p class="sb-kicker"><span class="sb-kicker__index">04</span><span class="sb-kicker__rule" aria-hidden="true"></span>Architecture</p>
+          <h2 class="sb-h2" id="architecture-title">Clean Architecture in <span class="sb-serif">three</span> Gradle modules.</h2>
+          <p class="sb-lead">The domain is pure Kotlin with no Android dependency, so the business rules run as fast JVM tests.</p>
+        </div>
+        <figure class="sb-card diagram-wrap sb-reveal">
+          <div class="diagram-scroll" tabindex="0" role="region" aria-label="Architecture diagram, scrollable">
             <svg class="diagram" viewBox="0 0 1000 520" role="img" aria-labelledby="arch-title arch-desc">
               <title id="arch-title">Module architecture</title>
               <desc id="arch-desc">The app module's Compose screens and ViewModels call use cases in the pure-Kotlin domain module. The data module implements the domain repository interfaces with Room, a WorkManager sync engine and Firebase Authentication, Realtime Database and Cloud Storage.</desc>
@@ -306,30 +329,31 @@
           <figcaption>Arrows show calls. The dashed arrow is “implements”: <code>:data</code> provides the interfaces that <code>:domain</code> declares.</figcaption>
         </figure>
 
-        <div class="flow">
-          <h3>Issuing a challan, step by step</h3>
+        <div class="flow sb-reveal">
+          <h3 class="sb-label flow-title">Issuing a challan, step by step</h3>
           <ol class="flow-steps">
-            <li><strong>Validate</strong> the plate, offences, phone number and photo evidence before anything is saved.</li>
-            <li><strong>Price</strong> it: prior offences are looked up remotely (4 s timeout) and merged with the local cache.</li>
-            <li><strong>Save</strong> to Room with <code>pendingOp = CREATE</code> and log the action.</li>
-            <li><strong>Share</strong> the QR-coded PDF straight away. No network needed.</li>
-            <li><strong>Sync</strong>: WorkManager uploads evidence, writes <code>/violations/{id}</code> and marks the row synced.</li>
+            <li class="sb-card"><span class="step-num">01</span><strong>Validate</strong> the plate, offences, phone number and photo evidence before anything is saved.</li>
+            <li class="sb-card"><span class="step-num">02</span><strong>Price</strong> it: prior offences are looked up remotely (4 s timeout) and merged with the local cache.</li>
+            <li class="sb-card"><span class="step-num">03</span><strong>Save</strong> to Room with <code>pendingOp = CREATE</code> and log the action.</li>
+            <li class="sb-card"><span class="step-num">04</span><strong>Share</strong> the QR-coded PDF straight away. No network needed.</li>
+            <li class="sb-card"><span class="step-num">05</span><strong>Sync</strong>: WorkManager uploads evidence, writes <code>/violations/{id}</code> and marks the row synced.</li>
           </ol>
         </div>
-      </div>
+      </div></div>
     </section>
 
-    <section id="data" class="section">
-      <div class="container">
-        <header class="section-head">
-          <p class="eyebrow">Data &amp; security</p>
-          <h2>Firebase data model and security rules</h2>
-          <p>Default-deny rules, roles from custom claims, and field-level validation on every write.</p>
-        </header>
-        <div class="data-grid">
-          <div class="card code-card">
-            <div class="card-head"><span>Realtime Database</span><code>firebase/sample-data.json</code></div>
-<pre><code><span class="k">"officers"</span>: {
+    <!-- ============================================================ data & rules -->
+    <section id="data" class="section-block" aria-labelledby="data-title">
+      <div class="sb-container"><div class="section-inner">
+        <div class="section-head sb-reveal">
+          <p class="sb-kicker"><span class="sb-kicker__index">05</span><span class="sb-kicker__rule" aria-hidden="true"></span>Data &amp; security</p>
+          <h2 class="sb-h2" id="data-title">Firebase data model and <span class="sb-serif">security rules.</span></h2>
+          <p class="sb-lead">Default-deny rules, roles from custom claims, and field-level validation on every write.</p>
+        </div>
+        <div class="data-grid sb-reveal">
+          <div class="sb-card code-card">
+            <div class="card-head"><span class="sb-card__title">Realtime Database</span><code>firebase/sample-data.json</code></div>
+<pre class="sb-code"><code><span class="k">"officers"</span>: {
   <span class="k">"&lt;uid&gt;"</span>: { name, email, <span class="k">role</span>, badgeNumber, station, active }
 },
 <span class="k">"violations"</span>: {
@@ -352,13 +376,13 @@
 <span class="k">"officerLogs"</span>: {
   <span class="k">"&lt;uid&gt;"</span>: { <span class="k">"&lt;logId&gt;"</span>: { action, details, referenceId, timestamp } }
 }</code></pre>
-            <p class="card-foot">Evidence lives in Cloud Storage at <code>evidence/{violationId}/{file}.jpg</code>. Room mirrors <code>violations</code> and <code>officer_logs</code> locally with a pending-operation marker.</p>
+            <p class="sb-card__foot card-foot">Evidence lives in Cloud Storage at <code>evidence/{violationId}/{file}.jpg</code>. Room mirrors <code>violations</code> and <code>officer_logs</code> locally with a pending-operation marker.</p>
           </div>
 
-          <div class="card">
-            <div class="card-head"><span>Security rules</span><code>firebase/database.rules.json</code></div>
-            <div class="table-scroll">
-              <table class="rules">
+          <div class="sb-card rules-card">
+            <div class="card-head"><span class="sb-card__title">Security rules</span><code>firebase/database.rules.json</code></div>
+            <div class="sb-table-wrap table-scroll">
+              <table class="sb-table rules">
                 <thead><tr><th scope="col">Path</th><th scope="col">Read</th><th scope="col">Write</th></tr></thead>
                 <tbody>
                   <tr><td data-label="Path"><code>/</code></td><td data-label="Read">denied</td><td data-label="Write">denied (default deny)</td></tr>
@@ -380,42 +404,46 @@
             </ul>
           </div>
         </div>
-      </div>
+      </div></div>
     </section>
 
-    <section id="stack" class="section section-alt">
-      <div class="container">
-        <header class="section-head">
-          <p class="eyebrow">Tech stack</p>
-          <h2>Modern Android, end to end</h2>
-        </header>
-        <div class="stack-grid">
-          <div class="stack-group"><h3>Language &amp; build</h3><ul class="chips"><li>Kotlin 2.1</li><li>Gradle Kotlin DSL</li><li>Version catalog</li><li>AGP 8.7</li><li>KSP</li></ul></div>
-          <div class="stack-group"><h3>UI</h3><ul class="chips"><li>Jetpack Compose</li><li>Material 3</li><li>Navigation Compose</li><li>Coil</li><li>Canvas charts</li></ul></div>
-          <div class="stack-group"><h3>Architecture</h3><ul class="chips"><li>Clean Architecture</li><li>MVVM</li><li>Hilt</li><li>Coroutines &amp; Flow</li></ul></div>
-          <div class="stack-group"><h3>Backend</h3><ul class="chips"><li>Firebase Auth</li><li>Realtime Database</li><li>Cloud Storage</li><li>Custom claims</li></ul></div>
-          <div class="stack-group"><h3>Local &amp; device</h3><ul class="chips"><li>Room</li><li>WorkManager</li><li>Fused Location</li><li>PdfDocument</li><li>ZXing</li></ul></div>
-          <div class="stack-group"><h3>Quality &amp; delivery</h3><ul class="chips"><li>JUnit 4</li><li>MockK</li><li>Turbine</li><li>Compose UI tests</li><li>GitHub Actions</li></ul></div>
+    <!-- ============================================================ stack -->
+    <section id="stack" class="section-block" aria-labelledby="stack-title">
+      <div class="sb-container"><div class="section-inner">
+        <div class="section-head sb-reveal">
+          <p class="sb-kicker"><span class="sb-kicker__index">06</span><span class="sb-kicker__rule" aria-hidden="true"></span>Tech stack</p>
+          <h2 class="sb-h2" id="stack-title">Modern Android, <span class="sb-serif">end to end.</span></h2>
         </div>
-      </div>
+        <div class="stack-grid sb-reveal">
+          <div class="sb-card stack-group"><h3 class="sb-label">Language &amp; build</h3><ul class="chips"><li class="sb-tag">Kotlin 2.1</li><li class="sb-tag">Gradle Kotlin DSL</li><li class="sb-tag">Version catalog</li><li class="sb-tag">AGP 8.7</li><li class="sb-tag">KSP</li></ul></div>
+          <div class="sb-card stack-group"><h3 class="sb-label">UI</h3><ul class="chips"><li class="sb-tag">Jetpack Compose</li><li class="sb-tag">Material 3</li><li class="sb-tag">Navigation Compose</li><li class="sb-tag">Coil</li><li class="sb-tag">Canvas charts</li></ul></div>
+          <div class="sb-card stack-group"><h3 class="sb-label">Architecture</h3><ul class="chips"><li class="sb-tag">Clean Architecture</li><li class="sb-tag">MVVM</li><li class="sb-tag">Hilt</li><li class="sb-tag">Coroutines &amp; Flow</li></ul></div>
+          <div class="sb-card stack-group"><h3 class="sb-label">Backend</h3><ul class="chips"><li class="sb-tag">Firebase Auth</li><li class="sb-tag">Realtime Database</li><li class="sb-tag">Cloud Storage</li><li class="sb-tag">Custom claims</li></ul></div>
+          <div class="sb-card stack-group"><h3 class="sb-label">Local &amp; device</h3><ul class="chips"><li class="sb-tag">Room</li><li class="sb-tag">WorkManager</li><li class="sb-tag">Fused Location</li><li class="sb-tag">PdfDocument</li><li class="sb-tag">ZXing</li></ul></div>
+          <div class="sb-card stack-group"><h3 class="sb-label">Quality &amp; delivery</h3><ul class="chips"><li class="sb-tag">JUnit 4</li><li class="sb-tag">MockK</li><li class="sb-tag">Turbine</li><li class="sb-tag">Compose UI tests</li><li class="sb-tag">GitHub Actions</li></ul></div>
+        </div>
+      </div></div>
     </section>
 
-    <section class="section get-started">
-      <div class="container gs-grid">
-        <div>
-          <p class="eyebrow">Get started</p>
-          <h2>Install it, or build it yourself</h2>
-          <p>Every push to <code>main</code> builds, lints and tests the app, publishes the APK to the rolling
-            <a href="https://github.com/srini2k03/traffic-violation-fine-manager/releases/tag/latest"><code>latest</code> release</a>
-            and refreshes the screenshots on this page.</p>
-          <div class="cta-row">
-            <a class="btn btn-primary" href="https://github.com/srini2k03/traffic-violation-fine-manager/releases/latest/download/traffic-fine-manager.apk">Download APK</a>
-            <a class="btn btn-ghost" href="https://github.com/srini2k03/traffic-violation-fine-manager#getting-started">Setup guide</a>
+    <!-- ============================================================ get started -->
+    <section class="section-block get-started" id="get-started" aria-labelledby="gs-title">
+      <div class="sb-container"><div class="section-inner">
+        <div class="gs-grid sb-reveal">
+          <div class="section-head">
+            <p class="sb-kicker"><span class="sb-kicker__index">07</span><span class="sb-kicker__rule" aria-hidden="true"></span>Get started</p>
+            <h2 class="sb-h2" id="gs-title">Install it, or <span class="sb-serif">build it</span> yourself.</h2>
+            <p class="sb-lead">Every push to <code>main</code> builds, lints and tests the app, publishes the APK to the rolling
+              <a href="https://github.com/srini2k03/traffic-violation-fine-manager/releases/tag/latest"><code>latest</code> release</a>
+              and refreshes the screenshots on this page.</p>
+            <div class="sb-hero__actions">
+              <a class="sb-btn sb-btn--primary" href="https://github.com/srini2k03/traffic-violation-fine-manager/releases/latest/download/traffic-fine-manager.apk">Download APK</a>
+              <a class="sb-btn sb-btn--ghost" href="https://github.com/srini2k03/traffic-violation-fine-manager#getting-started">Setup guide
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+            </div>
           </div>
-        </div>
-        <div class="card code-card terminal">
-          <div class="card-head"><span>Terminal</span></div>
-<pre><code><span class="c"># clone and run the JVM tests (no Android SDK needed)</span>
+          <div class="sb-card code-card terminal">
+            <div class="card-head"><span class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="sb-label">Terminal</span></div>
+<pre class="sb-code"><code><span class="c"># clone and run the JVM tests (no Android SDK needed)</span>
 git clone https://github.com/srini2k03/traffic-violation-fine-manager
 cd traffic-violation-fine-manager
 ./gradlew :domain:test
@@ -426,19 +454,26 @@ cd traffic-violation-fine-manager
 <span class="c"># optional: real backend</span>
 cp ~/Downloads/google-services.json app/
 firebase deploy --only database,storage</code></pre>
+          </div>
         </div>
-      </div>
+      </div></div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <p>© <span id="year">2026</span> Srinivasan Balasubramanian · MIT licence</p>
-      <p class="muted">Fine amounts are indicative values based on the Motor Vehicles (Amendment) Act, 2019 and are not legal advice.</p>
-      <p><a href="https://github.com/srini2k03/traffic-violation-fine-manager">github.com/srini2k03/traffic-violation-fine-manager</a></p>
+  <footer class="sb-footer">
+    <div class="sb-container sb-footer__inner">
+      <div class="footer-copy">
+        <p class="footer-name">© <span id="year">2026</span> Srinivasan Balasubramanian · MIT licence</p>
+        <p>Fine amounts are indicative values based on the Motor Vehicles (Amendment) Act, 2019 and are not legal advice.</p>
+        <p>Plain HTML, CSS and JavaScript from <code>web/</code>, published to GitHub Pages by GitHub Actions together with screenshots captured on an Android emulator.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://srini2k03.github.io/">Portfolio</a>
+        <a class="footer-icon" href="https://github.com/srini2k03/traffic-violation-fine-manager" aria-label="Source code on GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
     </div>
   </footer>
-
-  <script src="app.js"></script>
 </body>
 </html>
