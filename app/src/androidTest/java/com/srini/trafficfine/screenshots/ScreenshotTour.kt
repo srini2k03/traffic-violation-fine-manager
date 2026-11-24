@@ -69,6 +69,9 @@ class ScreenshotTour {
         clickText("Driving without seat belt")
         composeRule.waitUntilAtLeastOneExists(hasText("Adyar", substring = true), TIMEOUT)
         composeRule.waitUntilAtLeastOneExists(hasText("Total fine"), TIMEOUT)
+        // The fine preview is debounced; the breakdown card (its "Total" row) appears only once the
+        // amount is computed, so wait for it or the bottom bar is captured still showing Rs 0.
+        composeRule.waitUntilAtLeastOneExists(hasText("Total"), TIMEOUT)
         capture("issue")
         Espresso.pressBack()
 
