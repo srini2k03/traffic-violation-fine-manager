@@ -1,0 +1,30 @@
+{
+  "generated": "2026-11-26T04:47:10+00:00",
+  "commit": "f4e507d6c34bd3a989f3ac5c286dad9f3bd4dddd",
+  "screens": {
+    "admin": {
+      "dark": "admin-dark.png",
+      "light": "admin-light.png"
+    },
+    "dashboard": {
+      "dark": "dashboard-dark.png",
+      "light": "dashboard-light.png"
+    },
+    "detail": {
+      "dark": "detail-dark.png",
+      "light": "detail-light.png"
+    },
+    "history": {
+      "dark": "history-dark.png",
+      "light": "history-light.png"
+    },
+    "issue": {
+      "dark": "issue-dark.png",
+      "light": "issue-light.png"
+    },
+    "login": {
+      "dark": "login-dark.png",
+      "light": "login-light.png"
+    }
+  }
+}

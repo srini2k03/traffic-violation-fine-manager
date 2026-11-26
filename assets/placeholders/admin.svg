@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 800" role="img" aria-label="Admin analytics screen preview">
+<title>Admin analytics (preview)</title>
+<rect width="360" height="800" fill="#F4F6FB"/>
+<text x="20" y="22" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#1B2333">9:41</text>
+<rect x="300" y="12" width="40" height="10" rx="3" fill="#1B2333" opacity=".7"/>
+<rect x="0" y="32" width="360" height="56" fill="#FFFFFF"/>
+<path d="M28 60 l10 -10 M28 60 l10 10 M28 60 h18" stroke="#1B2333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<text x="64" y="66" font-family="system-ui,sans-serif" font-size="18" font-weight="600" fill="#1B2333" text-anchor="start">Admin console</text>
+<text x="100" y="116" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#0B3D91" text-anchor="middle">Analytics</text>
+<rect x="40" y="124" width="120" height="3" rx="1.5" fill="#0B3D91"/>
+<text x="260" y="116" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#8A94A8" text-anchor="middle">Officers</text>
+<rect x="16" y="140" width="54" height="30" rx="8" fill="#D9E2FF" stroke="#D9E2FF"/>
+<text x="23" y="160" font-family="system-ui,sans-serif" font-size="11.5" font-weight="500" fill="#0B3D91" text-anchor="start">7 days</text>
+<rect x="77.6" y="140" width="60" height="30" rx="8" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="84.6" y="160" font-family="system-ui,sans-serif" font-size="11.5" font-weight="500" fill="#1B2333" text-anchor="start">30 days</text>
+<rect x="145.79999999999998" y="140" width="60" height="30" rx="8" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="152.79999999999998" y="160" font-family="system-ui,sans-serif" font-size="11.5" font-weight="500" fill="#1B2333" text-anchor="start">90 days</text>
+<rect x="16" y="182" width="104" height="64" rx="14" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="28" y="212" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#0B3D91" text-anchor="start">₹48,500</text>
+<text x="28" y="232" font-family="system-ui,sans-serif" font-size="10.5" font-weight="500" fill="#8A94A8" text-anchor="start">Issued</text>
+<rect x="128" y="182" width="104" height="64" rx="14" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="140" y="212" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#0B3D91" text-anchor="start">71%</text>
+<text x="140" y="232" font-family="system-ui,sans-serif" font-size="10.5" font-weight="500" fill="#8A94A8" text-anchor="start">Collected</text>
+<rect x="240" y="182" width="104" height="64" rx="14" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="252" y="212" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#0B3D91" text-anchor="start">18%</text>
+<text x="252" y="232" font-family="system-ui,sans-serif" font-size="10.5" font-weight="500" fill="#8A94A8" text-anchor="start">Repeat</text>
+<rect x="16" y="258" width="328" height="196" rx="14" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="32" y="284" font-family="system-ui,sans-serif" font-size="12.5" font-weight="600" fill="#1B2333" text-anchor="start">Issued vs collected</text>
+<rect x="40" y="364" width="14" height="66" rx="3" fill="#0B3D91"/>
+<rect x="56" y="382" width="14" height="48" rx="3" fill="#FFB300"/>
+<rect x="82" y="334" width="14" height="96" rx="3" fill="#0B3D91"/>
+<rect x="98" y="358" width="14" height="72" rx="3" fill="#FFB300"/>
+<rect x="124" y="388" width="14" height="42" rx="3" fill="#0B3D91"/>
+<rect x="140" y="394" width="14" height="36" rx="3" fill="#FFB300"/>
+<rect x="166" y="316" width="14" height="114" rx="3" fill="#0B3D91"/>
+<rect x="182" y="346" width="14" height="84" rx="3" fill="#FFB300"/>
+<rect x="208" y="358" width="14" height="72" rx="3" fill="#0B3D91"/>
+<rect x="224" y="388" width="14" height="42" rx="3" fill="#FFB300"/>
+<rect x="250" y="340" width="14" height="90" rx="3" fill="#0B3D91"/>
+<rect x="266" y="364" width="14" height="66" rx="3" fill="#FFB300"/>
+<rect x="292" y="370" width="14" height="60" rx="3" fill="#0B3D91"/>
+<rect x="308" y="406" width="14" height="24" rx="3" fill="#FFB300"/>
+<rect x="16" y="466" width="328" height="150" rx="14" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="32" y="492" font-family="system-ui,sans-serif" font-size="12.5" font-weight="600" fill="#1B2333" text-anchor="start">Status</text>
+<circle cx="96" cy="556" r="40" fill="none" stroke="#2E7D32" stroke-width="18" stroke-dasharray="150 252" transform="rotate(-90 96 556)"/>
+<circle cx="96" cy="556" r="40" fill="none" stroke="#EF6C00" stroke-width="18" stroke-dasharray="80 252" stroke-dashoffset="-150" transform="rotate(-90 96 556)"/>
+<circle cx="96" cy="556" r="40" fill="none" stroke="#9E9E9E" stroke-width="18" stroke-dasharray="22 252" stroke-dashoffset="-230" transform="rotate(-90 96 556)"/>
+<text x="170" y="540" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#2E7D32" text-anchor="start">● Paid · 38</text>
+<text x="170" y="562" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#EF6C00" text-anchor="start">● Pending · 20</text>
+<text x="170" y="584" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#757575" text-anchor="start">● Cancelled · 6</text>
+<rect x="16" y="628" width="328" height="100" rx="14" fill="#FFFFFF" stroke="#DCE2EE"/>
+<text x="32" y="654" font-family="system-ui,sans-serif" font-size="12.5" font-weight="600" fill="#1B2333" text-anchor="start">Top offences</text>
+<text x="32" y="678" font-family="system-ui,sans-serif" font-size="10.5" font-weight="500" fill="#8A94A8" text-anchor="start">No helmet</text>
+<rect x="130" y="670" width="198.0" height="9" rx="4" fill="#0B3D91"/>
+<text x="32" y="696" font-family="system-ui,sans-serif" font-size="10.5" font-weight="500" fill="#8A94A8" text-anchor="start">No seat belt</text>
+<rect x="130" y="688" width="135.0" height="9" rx="4" fill="#6E8CC6"/>
+<text x="32" y="714" font-family="system-ui,sans-serif" font-size="10.5" font-weight="500" fill="#8A94A8" text-anchor="start">Over-speeding</text>
+<rect x="130" y="706" width="99.0" height="9" rx="4" fill="#6E8CC6"/>
+<rect x="70" y="756" width="220" height="24" rx="12" fill="#1B2333" opacity=".06"/>
+<text x="180.0" y="772" font-family="system-ui,sans-serif" font-size="10.5" font-weight="500" fill="#8A94A8" text-anchor="middle">Preview · real screenshot comes from CI</text>
+</svg>
