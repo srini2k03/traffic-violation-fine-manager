@@ -16,7 +16,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
-import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
@@ -73,7 +72,7 @@ class ScreenshotTour {
         // amount is computed, so wait for it or the bottom bar is captured still showing Rs 0.
         composeRule.waitUntilAtLeastOneExists(hasText("Total"), TIMEOUT)
         capture("issue")
-        Espresso.pressBack()
+        pressBack()
 
         composeRule.waitUntilAtLeastOneExists(hasTestTag(DASHBOARD_LIST_TAG), TIMEOUT)
         composeRule.onNodeWithTag(DASHBOARD_LIST_TAG).performScrollToNode(hasText("History"))
@@ -85,8 +84,8 @@ class ScreenshotTour {
         composeRule.waitUntilAtLeastOneExists(hasText("Challan details"), TIMEOUT)
         composeRule.waitUntilAtLeastOneExists(hasText("Total"), TIMEOUT)
         capture("detail")
-        Espresso.pressBack()
-        Espresso.pressBack()
+        pressBack()
+        pressBack()
 
         composeRule.waitUntilAtLeastOneExists(hasTestTag(DASHBOARD_LIST_TAG), TIMEOUT)
         val adminButton = hasText("Admin console", substring = true)
@@ -118,6 +117,16 @@ class ScreenshotTour {
             val view = activity.currentFocus ?: activity.window.decorView
             activity.getSystemService(InputMethodManager::class.java)?.hideSoftInputFromWindow(view.windowToken, 0)
         }
+        composeRule.waitForIdle()
+    }
+
+    /**
+     * Navigates back through the activity's OnBackPressedDispatcher (which Navigation Compose
+     * listens to). Espresso.pressBack() first waits for the root view to have window focus, which
+     * the CI emulator does not always grant, and the tour then fails.
+     */
+    private fun pressBack() {
+        composeRule.runOnUiThread { composeRule.activity.onBackPressedDispatcher.onBackPressed() }
         composeRule.waitForIdle()
     }
 
